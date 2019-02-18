@@ -9,7 +9,7 @@ public class UserDB extends DatabaseUtil implements DatabaseTemplate{
         java.util.Date date = new java.util.Date();
         Date sqlDate = new Date(2019, 2, 16);
         Timestamp ts = new Timestamp(date.getTime());
-        System.out.println(ts.toString());
+//        System.out.println(ts.toString());
         try {
             PreparedStatement cs = connection.prepareStatement("INSERT INTO user VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)");
             // userId is set to null so it can auto increment
@@ -33,5 +33,43 @@ public class UserDB extends DatabaseUtil implements DatabaseTemplate{
 //            e.printStackTrace();
             System.out.println(e);
         }
+    }
+
+    public ArrayList getUser(String columnName){
+        ArrayList<Object> arrayList = new ArrayList<>();
+        try {
+            Statement  statement = this.connection.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE
+            );
+            ResultSet resultSet = statement.executeQuery("SELECT " + columnName + " from user");
+//            resultSet.findColumn(columnName);
+            boolean done = false;
+            int count = 1;
+            resultSet.first();
+            while (!resultSet.isAfterLast()){
+//              resultSet.absolute(count);
+              arrayList.add(resultSet.getObject(1));
+              System.out.println(arrayList.get(count-1));
+              count++;
+              resultSet.next();
+            }
+            System.out.println(arrayList);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return arrayList;
+    }
+
+    public void deleteByUserId(int userId){
+        try {
+            PreparedStatement statement = this.connection.prepareStatement("DELETE FROM user WHERE userId=?");
+            statement.setInt(1, userId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 }
