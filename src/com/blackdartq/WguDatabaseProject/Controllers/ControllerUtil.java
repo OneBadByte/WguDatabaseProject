@@ -1,4 +1,4 @@
-package com.blackdartq.WguDatabaseProject.Controller;
+package com.blackdartq.WguDatabaseProject.Controllers;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,9 +10,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 class FxUtil{
-    final String PATH_TO_FXML = "../../../FXML/";
-    final public String LOGIN_FXML = "/FXML/Login.fxml";
-    final public String MAIN_FXML = "/FXML/sample.fxml";
+    final String PATH_TO_FXML = "/com/blackdartq/WguDatabaseProject/FXML/";
+    final public String LOGIN_FXML = PATH_TO_FXML + "Login.fxml";
+    final public String MAIN_FXML = PATH_TO_FXML + "MainView.fxml";
 
     //+++++++++ Stage functions ++++++++++
     public Stage getStage(Control control){

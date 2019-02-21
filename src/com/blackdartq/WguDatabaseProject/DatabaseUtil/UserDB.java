@@ -1,4 +1,4 @@
-package DatabaseUtil;
+package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -62,10 +62,10 @@ public class UserDB extends DatabaseUtil implements DatabaseTemplate{
         return arrayList;
     }
 
-    public void deleteByUserId(int userId){
+    public void deleteById(int id){
         try {
             PreparedStatement statement = this.connection.prepareStatement("DELETE FROM user WHERE userId=?");
-            statement.setInt(1, userId);
+            statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
