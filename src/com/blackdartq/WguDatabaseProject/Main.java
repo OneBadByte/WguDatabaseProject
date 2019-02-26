@@ -16,22 +16,21 @@ public class Main extends Application {
 //        com.blackdartq.WguDatabaseProject.DatabaseUtil databaseUtil = new com.blackdartq.WguDatabaseProject.DatabaseUtil();
 //        databaseUtil.createTables();
 //        databaseUtil.dropTables();
-//        UserDB userDB = new UserDB();
+        UserDB userDB = new UserDB();
 //        userDB.createTables();
 //        userDB.createTables();
-//        userDB.addRow();
-//        userDB.addRow();
-//        userDB.addRow();
-//        userDB.getUser("userName");
-//        userDB.deleteByUserId(2);
-//        userDB.getUser("userName");
-//        userDB.getUser("userName");
+        userDB.addRow();
+        userDB.addRow();
+        userDB.addRow();
+        userDB.getUser("userName");
+        userDB.deleteById(2);
+        userDB.getUser("userName");
 //        userDB.dropTables();
 //        userDB.dropTables();
 
         ControllerUtil controllerUtil = new ControllerUtil();
-//        controllerUtil.changeSceneTo(controllerUtil.LOGIN_FXML, new LoginController(), primaryStage);
-        controllerUtil.changeSceneTo(controllerUtil.MAIN_FXML, new MainViewController(), primaryStage);
+        controllerUtil.changeSceneTo(controllerUtil.LOGIN_FXML, new LoginController(), primaryStage);
+//        controllerUtil.changeSceneTo(controllerUtil.MAIN_FXML, new MainViewController(), primaryStage);
 //        Platform.exit();
     }
 

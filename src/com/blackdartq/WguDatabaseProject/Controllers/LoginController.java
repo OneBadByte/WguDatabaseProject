@@ -1,5 +1,6 @@
 package com.blackdartq.WguDatabaseProject.Controllers;
 
+import com.blackdartq.WguDatabaseProject.FileUtil.FileUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -46,6 +47,11 @@ public class LoginController extends ControllerUtil {
         String email = this.getTextFieldText(emailTextField);
         String password = this.getTextFieldText(passwordTextField);
         boolean test = email.equals("test") && password.equals("test");
+        if(test){
+            FileUtil.appendWriteToFile(this.LOG_FILE, "user: " + email + " logged in using: " + password);
+        }else{
+            FileUtil.appendWriteToFile(this.LOG_FILE, "user: " + email + " failed to log in using: " + password);
+        }
         return test;
     }
 

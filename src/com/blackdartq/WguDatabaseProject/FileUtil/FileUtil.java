@@ -13,7 +13,7 @@ public class FileUtil {
                reader = new BufferedReader(new FileReader(fileName));
                String temp = "";
                while ((temp = reader.readLine()) != null){
-                   output = output + temp;
+                   output = output + temp + "\n";
                }
            } catch (IOException e) {
                e.printStackTrace();
@@ -21,5 +21,20 @@ public class FileUtil {
        }
       return output;
    }
+
+   public static void appendWriteToFile(String fileName, String text){
+       String oldData = readFromFile(fileName);
+       System.out.println(oldData);
+       oldData = oldData + text;
+       try {
+           BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+           writer.write(oldData);
+           writer.close();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+
+   }
+
 }
 

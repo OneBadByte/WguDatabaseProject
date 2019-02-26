@@ -10,9 +10,11 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 class FxUtil{
-    final String PATH_TO_FXML = "/com/blackdartq/WguDatabaseProject/FXML/";
+    private final String PATH_TO_FXML = "/com/blackdartq/WguDatabaseProject/FXML/";
+    private final String PATH_TO_LOGFILES = "src/com/blackdartq/WguDatabaseProject/LogFiles/";
     final public String LOGIN_FXML = PATH_TO_FXML + "Login.fxml";
     final public String MAIN_FXML = PATH_TO_FXML + "MainView.fxml";
+    final public String LOG_FILE = PATH_TO_LOGFILES + "login.txt";
 
     //+++++++++ Stage functions ++++++++++
     public Stage getStage(Control control){
@@ -22,7 +24,7 @@ class FxUtil{
     public void changeSceneTo(String fxmlFIle, Object controller, Stage stage){
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFIle));
         loader.setController(controller);
-        Parent parent = null;
+        Parent parent;
         try {
             parent = loader.load();
         } catch (IOException e) {

@@ -98,97 +98,98 @@ public class MainViewController extends ControllerUtil {
         }
     }
 
-
-
     @FXML
     public void loadWeekGridPane(){
         monthGridPane.setVisible(false);
         weekGridPane.setVisible(true);
-
-        getWeekDayRange();
-
-        // fills in the current months days and at the end will fill in next months
-        boolean changedCount = false;
-        int count = 1;
-        int currentMonthEndDay = getEndMonthDay(0);
-        outerloop:
-        for(int column = 0; column < 7; column++){
-            if(count > currentMonthEndDay && !changedCount){
-                count = 1;
-                changedCount = true;
-            }
-            addToGridPane(weekGridPane, count, column, 1);
-            count++;
+        monthWeekLabel.setText(getWeekDayRange());
+        for(int i = 1; i < 8; i++){
+            addToGridPane(weekGridPane, getDayNumberFromWeekDay(i), i-1, 1);
         }
     }
 
     @FXML
     public void onPrevButtonClicked(){
-        monthMultiplier--;
-        clearAndReloadMonthGridPane();
+        if(monthGridPane.isVisible()){
+            monthMultiplier--;
+            clearGridPane(monthGridPane);
+            loadMonthGridPane();
+        }else {
+            weekMultiplier--;
+            clearGridPane(weekGridPane);
+            loadWeekGridPane();
+        }
     }
 
     @FXML
     public void onNextButtonClicked(){
-        monthMultiplier++;
-        clearAndReloadMonthGridPane();
+        if(monthGridPane.isVisible()){
+            monthMultiplier++;
+            clearGridPane(monthGridPane);
+            loadMonthGridPane();
+        }else {
+            weekMultiplier++;
+            clearGridPane(weekGridPane);
+            loadWeekGridPane();
+        }
     }
 
     //---------------------------
 
     //++++++ com.blackdartq.WguDatabaseProject.FXML Control Helpers ++++++
-
-    public void getMonday(int dayOfTheWeek){
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MONTH, Calendar.MONTH-1 + monthMultiplier);
-
+    private String getWeekDayRange(){
+        return getDateFromWeekDay(Calendar.SUNDAY) + " - " + getDateFromWeekDay(Calendar.SATURDAY);
     }
 
-    public String getWeekDayRange(){
-        String output = "";
+    private int getDayNumberFromWeekDay(int day){
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, Calendar.MONTH-1 + monthMultiplier);
-        calendar.set(Calendar.WEEK_OF_MONTH, Calendar.WEEK_OF_MONTH);
-        System.out.println(calendar.getTime());
-        System.out.println("Max of week: " + calendar.getFirstDayOfWeek());
-
-
-        return output;
+        calendar.set(Calendar.WEEK_OF_MONTH, Calendar.WEEK_OF_MONTH+1 + weekMultiplier);
+        calendar.set(Calendar.DAY_OF_WEEK, day);
+        return Integer.parseInt(new SimpleDateFormat("dd").format(calendar.getTime()));
     }
 
+    private String getDateFromWeekDay(int day){
+        System.out.println(getDayNumberFromWeekDay(day));
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MONTH, Calendar.MONTH-1 + monthMultiplier);
+        calendar.set(Calendar.WEEK_OF_MONTH, Calendar.WEEK_OF_MONTH+1 + weekMultiplier);
+        calendar.set(Calendar.DAY_OF_WEEK, day);
+        return new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime());
+    }
 
-    public String getCompleteDate(){
+    private String getCompleteDate(){
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, Calendar.MONTH-1 + monthMultiplier);
         return new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime());
     }
 
-    public String getFirstDayOfCurrentMonth(){
+    private String getFirstDayOfCurrentMonth(){
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, Calendar.MONTH-1 + monthMultiplier);
 
         // sets the beginning of the month
-        calendar.set(calendar.DAY_OF_MONTH,  calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
         return new SimpleDateFormat("EEEE").format(calendar.getTime());
     }
 
-    public int getEndMonthDay(int previousMonth){
+    private int getEndMonthDay(int previousMonth){
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, Calendar.MONTH-1 + monthMultiplier + previousMonth);
 
-        calendar.set(calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
         return Integer.parseInt(new SimpleDateFormat("d").format(calendar.getTime()));
 
     }
 
-    public void clearAndReloadMonthGridPane(){
+    private void clearGridPane(GridPane gridPane){
         for(Label label : this.labelArrayList){
-            monthGridPane.getChildren().remove(label);
+            gridPane.getChildren().remove(label);
         }
-        loadMonthGridPane();
+//        loadMonthGridPane();
     }
 
-    public void addToGridPane(GridPane gridPane, int text, int column, int row){
+    private void addToGridPane(GridPane gridPane, int text, int column, int row){
         Label label = new Label();
         label.setFont(Font.font(18));
         label.setText(String.valueOf(text));
