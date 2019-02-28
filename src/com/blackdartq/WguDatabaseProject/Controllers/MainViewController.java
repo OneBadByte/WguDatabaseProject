@@ -2,12 +2,18 @@ package com.blackdartq.WguDatabaseProject.Controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+enum GridPanes{
+    APPOINTMENT, MONTH, WEEK, CUSTOMER,
+}
 
 public class MainViewController extends ControllerUtil {
 
@@ -24,6 +30,10 @@ public class MainViewController extends ControllerUtil {
     public void initialize(){
 //        generateCalendar();
         loadMonthGridPane();
+
+        // loads data for the customer and appointment list views
+        fillOutListView(customerListView);
+        fillOutListView(appointmentListView);
     }
 
     //++++++ com.blackdartq.WguDatabaseProject.FXML Controls ++++++
@@ -34,23 +44,32 @@ public class MainViewController extends ControllerUtil {
 
     // Panes
     @FXML
-    GridPane monthGridPane;
+    public GridPane monthGridPane = new GridPane();
     @FXML
-    GridPane weekGridPane;
+    public GridPane weekGridPane = new GridPane();
+    @FXML
+    public Pane appointmentPane = new Pane();
+    @FXML
+    public Pane customerPane = new Pane();
+
+    // ListViews
+    @FXML
+    ListView customerListView;
+    @FXML
+    ListView appointmentListView;
     //---------------------------
 
     //++++++ com.blackdartq.WguDatabaseProject.FXML Control functions ++++++
     @FXML
-    public void loadMonthGridPane(){
+    public void loadMonthGridPane() {
         // changes which gridpane is being viewed
-        monthGridPane.setVisible(true);
-        weekGridPane.setVisible(false);
+        switchViabilityOfGridPane(GridPanes.MONTH);
 
 //        // creates a calender
         monthWeekLabel.setText(getCompleteDate());
 
         int startingColumn = 0;
-        switch (getFirstDayOfCurrentMonth()){
+        switch (getFirstDayOfCurrentMonth()) {
             case "Monday":
                 startingColumn = 1;
                 break;
@@ -69,7 +88,7 @@ public class MainViewController extends ControllerUtil {
             case "Saturday":
                 startingColumn = 6;
                 break;
-           default:
+            default:
             case "Sunday":
                 break;
         }
@@ -98,10 +117,38 @@ public class MainViewController extends ControllerUtil {
         }
     }
 
+    public void switchViabilityOfGridPane(GridPanes gridPanes){
+        switch(gridPanes){
+            case APPOINTMENT:
+                appointmentPane.setVisible(true);
+                customerPane.setVisible(false);
+                weekGridPane.setVisible(false);
+                monthGridPane.setVisible(false);
+                break;
+            case CUSTOMER:
+                appointmentPane.setVisible(false);
+                customerPane.setVisible(true);
+                weekGridPane.setVisible(false);
+                monthGridPane.setVisible(false);
+                break;
+            case WEEK:
+                appointmentPane.setVisible(false);
+                customerPane.setVisible(false);
+                weekGridPane.setVisible(true);
+                monthGridPane.setVisible(false);
+                break;
+            case MONTH:
+                appointmentPane.setVisible(false);
+                customerPane.setVisible(false);
+                weekGridPane.setVisible(false);
+                monthGridPane.setVisible(true);
+                break;
+        }
+    }
+
     @FXML
     public void loadWeekGridPane(){
-        monthGridPane.setVisible(false);
-        weekGridPane.setVisible(true);
+        switchViabilityOfGridPane(GridPanes.WEEK);
         monthWeekLabel.setText(getWeekDayRange());
         for(int i = 1; i < 8; i++){
             addToGridPane(weekGridPane, getDayNumberFromWeekDay(i), i-1, 1);
@@ -119,6 +166,25 @@ public class MainViewController extends ControllerUtil {
             clearGridPane(weekGridPane);
             loadWeekGridPane();
         }
+    }
+
+    @FXML
+    public void onAddCustomerButtonClicked(){
+        switchViabilityOfGridPane(GridPanes.CUSTOMER);
+    }
+
+    @FXML
+    public void onModifyCustomerButtonClicked(){
+        switchViabilityOfGridPane(GridPanes.CUSTOMER);
+    }
+
+    @FXML
+    public void onAddAppointmentButtonClicked(){
+        switchViabilityOfGridPane(GridPanes.APPOINTMENT);
+    }
+    @FXML
+    public void onModifyAppointmentButtonClicked(){
+        switchViabilityOfGridPane(GridPanes.APPOINTMENT);
     }
 
     @FXML
@@ -150,7 +216,6 @@ public class MainViewController extends ControllerUtil {
     }
 
     private String getDateFromWeekDay(int day){
-        System.out.println(getDayNumberFromWeekDay(day));
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, Calendar.MONTH-1 + monthMultiplier);
         calendar.set(Calendar.WEEK_OF_MONTH, Calendar.WEEK_OF_MONTH+1 + weekMultiplier);

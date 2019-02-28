@@ -4,10 +4,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Control;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 class FxUtil{
     private final String PATH_TO_FXML = "/com/blackdartq/WguDatabaseProject/FXML/";
@@ -73,4 +76,14 @@ public class ControllerUtil<T> extends FxUtil{
         }
     }
 
+    public void fillOutListView(ListView listView){
+        String[] test = {
+                "things1",
+                "things2",
+                "things3",
+                "things4",
+        };
+        listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        listView.getItems().setAll(test);
+    }
 }

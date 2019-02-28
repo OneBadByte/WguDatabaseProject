@@ -1,4 +1,10 @@
 package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 
-public class AppointmentDB {
+import java.sql.DatabaseMetaData;
+
+public class AppointmentDB implements DatabaseTemplate {
+    @Override
+    public void deleteById(int id) {
+
+    }
 }

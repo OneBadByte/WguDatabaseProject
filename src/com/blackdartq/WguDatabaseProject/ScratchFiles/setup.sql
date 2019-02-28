@@ -21,6 +21,7 @@ CREATE TABLE country
   lastUpdate   TIMESTAMP,
   lastUpdateBy VARCHAR(40)
 );
+INSERT INTO country VALUE(null, 'America', CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 
 CREATE TABLE city
 (
@@ -33,6 +34,7 @@ CREATE TABLE city
   lastUpdateBy VARCHAR(40),
   FOREIGN KEY (countryId) REFERENCES country (countryId) ON DELETE NO ACTION ON UPDATE CASCADE
 );
+INSERT INTO city VALUE(null, 'American fork', 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 
 CREATE TABLE address
 (
@@ -49,6 +51,8 @@ CREATE TABLE address
   FOREIGN KEY (cityId) REFERENCES city (cityId) ON DELETE NO ACTION ON UPDATE CASCADE
 );
 
+INSERT INTO address VALUE(null, '88s 740e', '88s 740e', 1, '84003', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+
 CREATE TABLE customer
 (
   customerId   INT(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -61,6 +65,10 @@ CREATE TABLE customer
   lastUpdateBy VARCHAR(40),
   FOREIGN KEY (addressId) REFERENCES address (addressId) ON DELETE NO ACTION ON UPDATE CASCADE
 );
+
+INSERT INTO customer VALUE(NULL, 'Test', 1, 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO customer VALUE(NULL, 'Test2', 1, 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO customer VALUE(NULL, 'Test3', 1, 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 
 CREATE TABLE appointment
 (
@@ -82,4 +90,7 @@ CREATE TABLE appointment
   FOREIGN KEY (customerId) REFERENCES customer (customerId) ON DELETE NO ACTION ON UPDATE CASCADE,
   FOREIGN KEY (userId) references user (userId) ON DELETE NO ACTION ON UPDATE CASCADE
 );
+
+INSERT INTO appointment VALUE(NULL, 1, 1, 'test wants something', 'testing', 'testing location', 'testing contract', 'testing type', 'http://youtube.com', CURDATE(), CURDATE(), CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+
 
