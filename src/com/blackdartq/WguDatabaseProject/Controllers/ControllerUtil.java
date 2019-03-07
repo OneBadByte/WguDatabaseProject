@@ -11,6 +11,18 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+enum ColorPicker{
+    RED,
+    YELLOW,
+    GREEN
+}
+class CustomColors{
+    final static String GREEN = " #439775";
+    final static String YELLOW = " ##ffff66";
+    final static String RED = "#FF7F7F";
+}
 
 class FxUtil{
     private final String PATH_TO_FXML = "/com/blackdartq/WguDatabaseProject/FXML/";
@@ -76,14 +88,14 @@ public class ControllerUtil<T> extends FxUtil{
         }
     }
 
-    public void fillOutListView(ListView listView){
-        String[] test = {
-                "things1",
-                "things2",
-                "things3",
-                "things4",
-        };
+    public void fillOutListView(ArrayList arrayList, ListView listView){
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        listView.getItems().setAll(test);
+        listView.getItems().setAll(arrayList);
+    }
+
+    public int getSelectedElementInListView(ListView listView){
+        int test = listView.getSelectionModel().getSelectedIndex();
+        System.out.println("selected row: " + test);
+        return test;
     }
 }

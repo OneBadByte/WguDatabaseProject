@@ -26,8 +26,9 @@ public class Main extends Application {
 //        userDB.dropTables();
 
         //++++++ customer database +++++++++
-        CustomerDB customerDB = new CustomerDB();
-        customerDB.dropTables();
+//        CustomerDB customerDB = new CustomerDB();
+//        customerDB.getAllCustomers();
+//        customerDB.dropTables();
 
 
         ControllerUtil controllerUtil = new ControllerUtil();

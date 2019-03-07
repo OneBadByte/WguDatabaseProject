@@ -3,9 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -14,15 +15,29 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #439775;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label alignment="CENTER" prefHeight="57.0" prefWidth="1200.0" style="-fx-background-color: #439775;" text="Schedule It" textAlignment="CENTER" textFill="WHITE">
-         <font>
-            <Font size="41.0" />
-         </font></Label>
-      <SplitPane dividerPositions="0.25375626043405675" layoutY="57.0" prefHeight="747.0" prefWidth="1200.0">
+      <VBox alignment="CENTER" prefHeight="62.0" prefWidth="1207.0" style="-fx-background-color: #FF7F7F;">
+         <children>
+            <Label fx:id="ScheduleItLabel" alignment="CENTER" onMouseClicked="#deleteDatabase" prefHeight="53.0" prefWidth="1207.0" style="-fx-background-color: #439775;" text="Schedule It" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="32.0" />
+               </font>
+            </Label>
+            <Label fx:id="alertLabel" alignment="CENTER" prefHeight="18.0" prefWidth="1232.0" style="-fx-background-color: #439775;" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Label>
+         </children>
+      </VBox>
+      <SplitPane dividerPositions="0.25375626043405675" layoutY="61.0" prefHeight="743.0" prefWidth="1200.0" style="-fx-background-color: #439775;">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="490.0" prefWidth="285.0">
                <children>
@@ -47,7 +62,7 @@
                                           <Font size="12.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="deleteCustomerButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="64.0" style="-fx-background-color: #439775#439775;" text="Delete" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+                                    <Button fx:id="deleteCustomerButton" mnemonicParsing="false" onMouseClicked="#onDeleteCustomerButtonClicked" prefHeight="26.0" prefWidth="64.0" style="-fx-background-color: #439775#439775;" text="Delete" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                                        <font>
                                           <Font size="12.0" />
                                        </font>
@@ -88,9 +103,9 @@
                   </SplitPane>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: #48bf84;" SplitPane.resizableWithParent="false">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="702.0" prefWidth="884.0" style="-fx-background-color: #48bf84;" SplitPane.resizableWithParent="false">
                <children>
-                  <HBox alignment="CENTER_LEFT" focusTraversable="true" prefHeight="51.0" prefWidth="890.0" spacing="10.0">
+                  <HBox alignment="CENTER_LEFT" focusTraversable="true" layoutY="7.0" prefHeight="40.0" prefWidth="890.0" spacing="10.0">
                      <children>
                         <Button mnemonicParsing="false" onMouseClicked="#loadWeekGridPane" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #fffdf9;" text="Week View" />
                         <Button mnemonicParsing="false" onMouseClicked="#loadMonthGridPane" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #fffdf9;" text="Month View">
@@ -223,17 +238,17 @@
                      </children>
                   </GridPane>
                   <Pane fx:id="appointmentPane" layoutX="14.0" layoutY="56.0" prefHeight="676.0" prefWidth="860.0" style="-fx-background-color: white;" visible="false" />
-                  <Pane fx:id="customerPane" layoutX="19.0" layoutY="53.0" prefHeight="676.0" prefWidth="860.0">
+                  <Pane fx:id="customerPane" layoutX="19.0" layoutY="62.0" prefHeight="667.0" prefWidth="860.0">
                      <children>
                         <GridPane layoutX="127.0" layoutY="77.0" prefHeight="515.0" prefWidth="606.0" style="-fx-background-color: white; -fx-border-color: #439775;">
                           <columnConstraints>
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints fillWidth="false" halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                           </columnConstraints>
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
@@ -241,16 +256,24 @@
                           </rowConstraints>
                            <children>
                               <Label text="Customer Name" />
-                              <Label text="Address" GridPane.rowIndex="1" />
-                              <Label text="Label" GridPane.rowIndex="2" />
-                              <Label text="Label" GridPane.rowIndex="3" />
-                              <Label text="Label" GridPane.rowIndex="4" />
-                              <Label text="Label" GridPane.rowIndex="5" />
-                              <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" text="Save" textAlignment="CENTER" GridPane.rowIndex="6" />
+                              <Label text="Phone" GridPane.rowIndex="1" />
+                              <Label text="Address" GridPane.rowIndex="2" />
+                              <Label text="City" GridPane.rowIndex="3" />
+                              <Label text="Country" GridPane.rowIndex="4" />
+                              <Button fx:id="customerSaveButton" mnemonicParsing="false" onMouseClicked="#onCustomerSaveButtonClicked" prefHeight="40.0" prefWidth="100.0" text="Save" textAlignment="CENTER" GridPane.rowIndex="6" />
                               <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" text="Cancel" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                              <TextField GridPane.columnIndex="1" />
-                              <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <DatePicker GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <TextField fx:id="customerNameTextField" prefWidth="200.0" GridPane.columnIndex="1" />
+                              <TextField prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="Postal Code" GridPane.rowIndex="5" />
+                              <TextField prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <TextField prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <MenuButton fx:id="countryMenuBar" mnemonicParsing="false" text="MenuButton" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                <items>
+                                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                                  <MenuItem mnemonicParsing="false" text="Action 2" />
+                                </items>
+                              </MenuButton>
                            </children>
                            <padding>
                               <Insets right="20.0" />
