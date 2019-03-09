@@ -14,23 +14,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage){
-
-//        com.blackdartq.WguDatabaseProject.DatabaseUtil databaseUtil = new com.blackdartq.WguDatabaseProject.DatabaseUtil();
-//        UserDB userDB = new UserDB();
-//        userDB.addRow();
-//        userDB.addRow();
-//        userDB.addRow();
-//        userDB.getUser("userName");
-//        userDB.deleteById(2);
-//        userDB.getUser("userName");
-//        userDB.dropTables();
-
-        //++++++ customer database +++++++++
-//        CustomerDB customerDB = new CustomerDB();
-//        customerDB.getAllCustomers();
-//        customerDB.dropTables();
-
-
         ControllerUtil controllerUtil = new ControllerUtil();
 //        controllerUtil.changeSceneTo(controllerUtil.LOGIN_FXML, new LoginController(), primaryStage);
         controllerUtil.changeSceneTo(controllerUtil.MAIN_FXML, new MainViewController(), primaryStage);

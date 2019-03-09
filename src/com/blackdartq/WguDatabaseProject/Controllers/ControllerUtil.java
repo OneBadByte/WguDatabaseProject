@@ -3,10 +3,7 @@ package com.blackdartq.WguDatabaseProject.Controllers;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Control;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -32,10 +29,17 @@ class FxUtil{
     final public String LOG_FILE = PATH_TO_LOGFILES + "login.txt";
 
     //+++++++++ Stage functions ++++++++++
+
+    /**
+     *
+     */
     public Stage getStage(Control control){
         return (Stage)  control.getScene().getWindow();
     }
 
+    /**
+     *
+     */
     public void changeSceneTo(String fxmlFIle, Object controller, Stage stage){
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFIle));
         loader.setController(controller);
@@ -50,6 +54,9 @@ class FxUtil{
         stage.show();
     }
 
+    /**
+     *
+     */
     public void changeSceneTo(String fxmlFile, Object controller, Control control){
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
         loader.setController(controller);
@@ -68,18 +75,31 @@ class FxUtil{
 public class ControllerUtil<T> extends FxUtil{
 
     //+++++++++ control functions ++++++++++
+
+    /**
+     *
+     */
     public String getTextFieldText(TextField textField){
         return textField.getText();
     }
 
+    /**
+     *
+     */
     public int getTextFieldInt(TextField textField){
         return Integer.parseInt(textField.getText());
     }
 
+    /**
+     *
+     */
     public double getTextFieldDouble(TextField textField){
         return Double.parseDouble(textField.getText());
     }
 
+    /**
+     *
+     */
     public void setTextField(TextField textField, Object object){
         if(object instanceof Integer || object instanceof Double){
             textField.setText(String.valueOf(object));
@@ -88,11 +108,33 @@ public class ControllerUtil<T> extends FxUtil{
         }
     }
 
+    /**
+     *
+     */
+    public void fillOutChoiceBox(ChoiceBox choiceBox , ArrayList<String> arrayList){
+        choiceBox.getItems().setAll(arrayList);
+//        for(String stuff : arrayList){
+//        }
+    }
+
+    /**
+     *
+     */
+    public void getSelectedChoiceBox(ChoiceBox choiceBox){
+       choiceBox.getSelectionModel().getSelectedIndex();
+    }
+
+    /**
+     *
+     */
     public void fillOutListView(ArrayList arrayList, ListView listView){
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         listView.getItems().setAll(arrayList);
     }
 
+    /**
+     *
+     */
     public int getSelectedElementInListView(ListView listView){
         int test = listView.getSelectionModel().getSelectedIndex();
         System.out.println("selected row: " + test);

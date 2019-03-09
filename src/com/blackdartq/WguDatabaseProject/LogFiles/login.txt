@@ -19,3 +19,8 @@ user: test logged in using: test
 user: test logged in using: test
 user: test logged in using: test
 user: test logged in using: test
+user: test failed to log in using: test
+user: test logged in using: test
+user: test logged in using: test
+user: test failed to log in using: sddssdsd
+user: test logged in using: test

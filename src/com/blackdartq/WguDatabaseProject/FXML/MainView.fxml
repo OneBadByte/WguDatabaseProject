@@ -2,11 +2,10 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -261,19 +260,14 @@
                               <Label text="City" GridPane.rowIndex="3" />
                               <Label text="Country" GridPane.rowIndex="4" />
                               <Button fx:id="customerSaveButton" mnemonicParsing="false" onMouseClicked="#onCustomerSaveButtonClicked" prefHeight="40.0" prefWidth="100.0" text="Save" textAlignment="CENTER" GridPane.rowIndex="6" />
-                              <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" text="Cancel" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <Button fx:id="customerCancelButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" text="Cancel" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                               <TextField fx:id="customerNameTextField" prefWidth="200.0" GridPane.columnIndex="1" />
-                              <TextField prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField fx:id="customerPhoneNumberTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <Label text="Postal Code" GridPane.rowIndex="5" />
-                              <TextField prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <TextField prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <TextField prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <MenuButton fx:id="countryMenuBar" mnemonicParsing="false" text="MenuButton" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                                <items>
-                                  <MenuItem mnemonicParsing="false" text="Action 1" />
-                                  <MenuItem mnemonicParsing="false" text="Action 2" />
-                                </items>
-                              </MenuButton>
+                              <TextField fx:id="customerAddressTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="customerCityTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <TextField fx:id="customerPostalCodeTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <ChoiceBox fx:id="countryChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                            </children>
                            <padding>
                               <Insets right="20.0" />

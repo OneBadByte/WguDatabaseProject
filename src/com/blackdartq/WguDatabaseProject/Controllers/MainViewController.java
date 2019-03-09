@@ -12,18 +12,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-enum GridPanes{
+// used to switch between panes
+enum GridPanes {
     APPOINTMENT, MONTH, WEEK, CUSTOMER,
 }
 
 public class MainViewController extends ControllerUtil {
 
+    // Database connections
     private CustomerDB customerDB = new CustomerDB();
     private AddressDB addressDB = new AddressDB();
 
     // used to change the month for the calendars
     private int monthMultiplier = 0;
-
 
     //used to change the week for the week view calendar
     private int weekMultiplier = 0;
@@ -31,16 +32,17 @@ public class MainViewController extends ControllerUtil {
     // used to store the labels in the calendar so they can be removed when changing months/weeks
     private ArrayList<Label> labelArrayList = new ArrayList<>();
 
-    public void initialize(){
+    /**
+     * Constructor for Class
+     */
+    public void initialize() {
 //        generateCalendar();
         loadMonthGridPane();
 
         // loads data for the customer and appointment list views
         fillOutListView(customerDB.getAllCustomerNames(), customerListView);
         fillOutListView(customerDB.getAllCustomerIDs(), appointmentListView);
-
-        MenuItem menuItem = (MenuItem) addressDB.getCountries();
-        countryMenuButton.getItems().setAll(menuItem);
+        fillOutChoiceBox(countryChoiceBox, addressDB.getCountries());
 
 //        customerDB.dropTables();
     }
@@ -55,15 +57,25 @@ public class MainViewController extends ControllerUtil {
 
     // split menu button
     @FXML
-    MenuButton countryMenuButton;
+    ChoiceBox countryChoiceBox;
 
-    // Input Fields
+    // Text Fields
     @FXML
     TextField customerNameTextField;
+    @FXML
+    TextField customerPhoneNumberTextField;
+    @FXML
+    TextField customerAddressTextField;
+    @FXML
+    TextField customerCityTextField;
+    @FXML
+    TextField customerPostalCodeTextField;
 
     // Buttons
     @FXML
     Button customerSaveButton;
+    @FXML
+    Button customerCancelButton;
 
     // Panes
     @FXML
@@ -83,6 +95,10 @@ public class MainViewController extends ControllerUtil {
     //---------------------------
 
     //++++++ com.blackdartq.WguDatabaseProject.FXML Control functions ++++++
+
+    /**
+     *
+     */
     @FXML
     public void loadMonthGridPane() {
         // changes which gridpane is being viewed
@@ -118,7 +134,7 @@ public class MainViewController extends ControllerUtil {
 
         // fills in the days before the current months starting day
         int previousMonthsFinalDay = getPreviousMonthEndDay();
-        for(int i = startingColumn-1; i >= 0; i--){
+        for (int i = startingColumn - 1; i >= 0; i--) {
             addToGridPane(monthGridPane, previousMonthsFinalDay--, i, 1);
         }
 
@@ -126,9 +142,9 @@ public class MainViewController extends ControllerUtil {
         boolean changedCount = false;
         int count = 1;
         int currentMonthEndDay = getEndMonthDay();
-        for(int row = 1; row < 7; row++){
-            for(int column = startingColumn; column < 7; column++){
-                if(count > currentMonthEndDay && !changedCount){
+        for (int row = 1; row < 7; row++) {
+            for (int column = startingColumn; column < 7; column++) {
+                if (count > currentMonthEndDay && !changedCount) {
                     count = 1;
                     changedCount = true;
                 }
@@ -139,18 +155,24 @@ public class MainViewController extends ControllerUtil {
         }
     }
 
+    /**
+     *
+     */
     @FXML
-    public void loadWeekGridPane(){
+    public void loadWeekGridPane() {
         switchViabilityOfGridPane(GridPanes.WEEK);
         monthWeekLabel.setText(getWeekDayRange());
-        for(int i = 1; i < 8; i++){
-            addToGridPane(weekGridPane, getDayNumberFromWeekDay(i), i-1, 1);
+        for (int i = 1; i < 8; i++) {
+            addToGridPane(weekGridPane, getDayNumberFromWeekDay(i), i - 1, 1);
         }
     }
 
 
-    public void switchViabilityOfGridPane(GridPanes gridPanes){
-        switch(gridPanes){
+    /**
+     *
+     */
+    public void switchViabilityOfGridPane(GridPanes gridPanes) {
+        switch (gridPanes) {
             case APPOINTMENT:
                 appointmentPane.setVisible(true);
                 customerPane.setVisible(false);
@@ -178,13 +200,16 @@ public class MainViewController extends ControllerUtil {
         }
     }
 
+    /**
+     *
+     */
     @FXML
-    public void onPrevButtonClicked(){
-        if(monthGridPane.isVisible()){
+    public void onPrevButtonClicked() {
+        if (monthGridPane.isVisible()) {
             monthMultiplier--;
             clearGridPane(monthGridPane);
             loadMonthGridPane();
-        }else {
+        } else {
             weekMultiplier--;
             clearGridPane(weekGridPane);
             loadWeekGridPane();
@@ -192,10 +217,14 @@ public class MainViewController extends ControllerUtil {
     }
 
     // Customer controls
-    private void sendAnAlert(String message, ColorPicker colors){
+
+    /**
+     *
+     */
+    private void sendAnAlert(String message, ColorPicker colors) {
         alertLabel.setText(message);
         String color = "";
-        switch (colors){
+        switch (colors) {
             case GREEN:
                 color = CustomColors.GREEN;
                 break;
@@ -209,20 +238,29 @@ public class MainViewController extends ControllerUtil {
         alertLabel.setStyle("-fx-background-color: " + color + ";");
     }
 
+    /**
+     *
+     */
     @FXML
-    public void onAddCustomerButtonClicked(){
+    public void onAddCustomerButtonClicked() {
         switchViabilityOfGridPane(GridPanes.CUSTOMER);
     }
 
+    /**
+     *
+     */
     @FXML
-    public void onModifyCustomerButtonClicked(){
+    public void onModifyCustomerButtonClicked() {
         switchViabilityOfGridPane(GridPanes.CUSTOMER);
     }
 
+    /**
+     *
+     */
     @FXML
-    public void onDeleteCustomerButtonClicked(){
-        if(customerDB.getCustomersSize() == 0){
-           return;
+    public void onDeleteCustomerButtonClicked() {
+        if (customerDB.getCustomersSize() == 0) {
+            return;
         }
         // deletes the index from the database
         customerDB.deleteCustomerByIndex(getSelectedElementInListView(customerListView));
@@ -233,45 +271,68 @@ public class MainViewController extends ControllerUtil {
     }
 
     // Appointment controls
+
+    /**
+     *
+     */
     @FXML
-    public void onAddAppointmentButtonClicked(){
-        switchViabilityOfGridPane(GridPanes.APPOINTMENT);
-    }
-    @FXML
-    public void onModifyAppointmentButtonClicked(){
+    public void onAddAppointmentButtonClicked() {
         switchViabilityOfGridPane(GridPanes.APPOINTMENT);
     }
 
+    /**
+     *
+     */
     @FXML
-    public void onNextButtonClicked(){
-        if(monthGridPane.isVisible()){
+    public void onModifyAppointmentButtonClicked() {
+        switchViabilityOfGridPane(GridPanes.APPOINTMENT);
+    }
+
+    /**
+     *
+     */
+    @FXML
+    public void onNextButtonClicked() {
+        if (monthGridPane.isVisible()) {
             monthMultiplier++;
             clearGridPane(monthGridPane);
             loadMonthGridPane();
-        }else {
+        } else {
             weekMultiplier++;
             clearGridPane(weekGridPane);
             loadWeekGridPane();
         }
     }
 
+
+    /**
+     *
+     */
     @FXML
-    public void onCustomerSaveButtonClicked(){
+    public void onCustomerSaveButtonClicked() {
         //TODO add address
+        if(!checkAllCustomerFieldsFilledOut()){
+            return;
+        }
         String customerName = customerNameTextField.getText();
         sendAnAlert(customerName + " was added to the database", ColorPicker.YELLOW);
         System.out.println(customerName);
-        if(customerName.equals("")){
+        if (customerName.equals("")) {
             sendAnAlert("Enter a customer name please", ColorPicker.RED);
             return;
         }
         customerDB.addCustomer(customerName, 1);
         fillOutListView(customerDB.getAllCustomerNames(), customerListView);
         resetCustomerFields();
+        switchViabilityOfGridPane(GridPanes.MONTH);
+        sendAnAlert("", ColorPicker.GREEN);
     }
 
+    /**
+     *
+     */
     @FXML
-    public void deleteDatabase(){
+    public void deleteDatabase() {
         customerDB.dropTables();
         sendAnAlert("deleting database!!!", ColorPicker.RED);
     }
@@ -280,71 +341,132 @@ public class MainViewController extends ControllerUtil {
 
     //++++++ com.blackdartq.WguDatabaseProject.FXML Control Helpers ++++++
 
-    private void resetCustomerFields(){
+    /**
+     *
+     */
+    public boolean checkAllCustomerFieldsFilledOut(){
+        TextField[] textFields = {
+                customerNameTextField,
+                customerPhoneNumberTextField,
+                customerAddressTextField,
+                customerCityTextField,
+                customerPostalCodeTextField,
+        };
+        boolean output = true;
+        for(TextField textField : textFields){
+            if(textField.getText().equals("")){
+                textField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
+                sendAnAlert("Please fill in all fields", ColorPicker.RED);
+                output = false;
+            }else{
+                textField.setStyle("-fx-border-color: grey; -fx-background-color: white;");
+            }
+        }
+        return output;
+    }
+
+    /**
+     *
+     */
+    private void resetCustomerFields() {
         customerNameTextField.clear();
     }
 
-    private Calendar createCalendar(){
+    /**
+     *
+     */
+    private Calendar createCalendar() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + monthMultiplier);
         return calendar;
     }
 
-    private Calendar createCalendar(int monthDelta, int weekDelta){
+    /**
+     *
+     */
+    private Calendar createCalendar(int monthDelta, int weekDelta) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + monthMultiplier + monthDelta);
         calendar.set(Calendar.WEEK_OF_MONTH, calendar.get(Calendar.WEEK_OF_MONTH) + weekMultiplier + weekDelta);
         return calendar;
     }
 
-    private String getWeekDayRange(){
+    /**
+     *
+     */
+    private String getWeekDayRange() {
         return getDateFromWeekDay(Calendar.SUNDAY) + " - " + getDateFromWeekDay(Calendar.SATURDAY);
     }
 
-    private int getDayNumberFromWeekDay(int day){
+    /**
+     *
+     */
+    private int getDayNumberFromWeekDay(int day) {
         Calendar calendar = createCalendar();
         calendar.set(Calendar.DAY_OF_WEEK, day);
         return Integer.parseInt(new SimpleDateFormat("dd").format(calendar.getTime()));
     }
 
-    private String getDateFromWeekDay(int day){
+    /**
+     *
+     */
+    private String getDateFromWeekDay(int day) {
         Calendar calendar = createCalendar();
         calendar.set(Calendar.DAY_OF_WEEK, day);
         return new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime());
     }
 
-    private String getCompleteCurrentDate(){
+    /**
+     *
+     */
+    private String getCompleteCurrentDate() {
         Calendar calendar = createCalendar();
         System.out.println(new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime()));
         return new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime());
     }
 
-    private String getFirstDayOfCurrentMonth(){
+    /**
+     *
+     */
+    private String getFirstDayOfCurrentMonth() {
         Calendar calendar = createCalendar();
         // sets the beginning of the month
-        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
         return new SimpleDateFormat("EEEE").format(calendar.getTime());
     }
 
-    private int getEndMonthDay(){
+    /**
+     *
+     */
+    private int getEndMonthDay() {
         Calendar calendar = createCalendar();
-        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        return Integer.parseInt(new SimpleDateFormat("d").format(calendar.getTime()));
-    }
-    private int getPreviousMonthEndDay(){
-        Calendar calendar = createCalendar(-1, 0);
-        calendar.set(Calendar.DAY_OF_MONTH,  calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
         return Integer.parseInt(new SimpleDateFormat("d").format(calendar.getTime()));
     }
 
-    private void clearGridPane(GridPane gridPane){
-        for(Label label : this.labelArrayList){
+    /**
+     *
+     */
+    private int getPreviousMonthEndDay() {
+        Calendar calendar = createCalendar(-1, 0);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        return Integer.parseInt(new SimpleDateFormat("d").format(calendar.getTime()));
+    }
+
+    /**
+     *
+     */
+    private void clearGridPane(GridPane gridPane) {
+        for (Label label : this.labelArrayList) {
             gridPane.getChildren().remove(label);
         }
 //        loadMonthGridPane();
     }
 
-    private void addToGridPane(GridPane gridPane, int text, int column, int row){
+    /**
+     *
+     */
+    private void addToGridPane(GridPane gridPane, int text, int column, int row) {
         Label label = new Label();
         label.setFont(Font.font(18));
         label.setText(String.valueOf(text));

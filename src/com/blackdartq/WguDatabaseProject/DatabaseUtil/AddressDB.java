@@ -1,5 +1,6 @@
 package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,12 +15,20 @@ import java.util.List;
 
 public class AddressDB extends DatabaseUtil {
 //    ArrayList<AddressHolder> addressHolders = new ArrayList<>();
-    private Collection<String> countries = new ArrayList<>();
+    private ArrayList<String> countries = new ArrayList<>();
 
-    public Collection<String> getCountries() {
+    /**
+     *
+     */
+    public ArrayList<String> getCountries() {
+        countries.clear();
+        getCountriesFromDatabase();
         return countries;
     }
 
+    /**
+     *
+     */
     public void getCountriesFromDatabase(){
         try {
             Statement statement = connection.createStatement();
@@ -33,5 +42,16 @@ public class AddressDB extends DatabaseUtil {
         }
     }
 
+    public void addCity(String city, int countryId){
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO city VALUE(null, ?, ?, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');");
+            ps.setString(1, city);
+            ps.setInt(2, countryId);
+            ps.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Couldn't add city to the database");
+        }
+    }
 }
 

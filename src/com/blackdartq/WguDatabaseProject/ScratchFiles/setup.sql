@@ -11,6 +11,7 @@ CREATE TABLE user
 );
 
 INSERT INTO user value(NULL, 'test', 'test', 0, CURDATE(), 'admin', CURRENT_TIMESTAMP, 'admin');
+# SELECT * from user where userName = 'test' and password = 'test';
 
 CREATE TABLE country
 (
@@ -61,10 +62,10 @@ CREATE TABLE address
 );
 
 INSERT INTO address VALUE(null, '828s 7540e', '828s 7402e', 1, '84003', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO address VALUE(null, '828s 5740e', '838s 74023e', 2, '84004', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO address VALUE(null, '828s 7540e', '884s 7403e', 3, '84005', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO address VALUE(null, '838s 7540e', '885s 7404e', 4, '84006', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO address VALUE(null, '848s 7450e', '886s 74320e', 5, '84007', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO address VALUE(null, '828s 5740e', '838s 74023e', 1, '84004', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO address VALUE(null, '828s 7540e', '884s 7403e', 1, '84005', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO address VALUE(null, '838s 7540e', '885s 7404e', 1, '84006', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO address VALUE(null, '848s 7450e', '886s 74320e', 1, '84007', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 
 CREATE TABLE customer
 (

@@ -3,8 +3,30 @@ package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class UserDB extends DatabaseUtil implements DatabaseTemplate{
+public class UserDB extends DatabaseUtil implements DatabaseTemplate {
 
+    public boolean validateUser(String username, String password) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user WHERE userName = ? and password = ?");
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            int count = 0;
+            if (resultSet.next()) {
+                count++;
+            }
+            return count > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    /**
+     * adds a user to the database
+     * TODO fix it to take parameters
+     */
     public void addRow(){
         java.util.Date date = new java.util.Date();
         Date sqlDate = new Date(2019, 2, 16);
@@ -50,12 +72,9 @@ public class UserDB extends DatabaseUtil implements DatabaseTemplate{
             while (!resultSet.isAfterLast()){
 //              resultSet.absolute(count);
               arrayList.add(resultSet.getObject(1));
-              System.out.println(arrayList.get(count-1));
               count++;
               resultSet.next();
             }
-            System.out.println(arrayList);
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
