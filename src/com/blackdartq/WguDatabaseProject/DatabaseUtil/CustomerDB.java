@@ -1,5 +1,7 @@
 package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 
+import com.blackdartq.WguDatabaseProject.Controllers.ControllerUtil;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,10 +11,12 @@ import java.util.ArrayList;
 class Customer{
     int customerId;
     String customerName;
+    int addressId;
 
-    Customer(int Id, String customerName){
+    Customer(int Id, String customerName, int addressId){
         this.customerId = Id;
         this.customerName = customerName;
+        this.addressId = addressId;
     }
 }
 
@@ -65,23 +69,40 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
        deleteById(id);
     }
 
+    /**
+     * Gets the customer name from customers by index
+     */
+
+    public String getCustomerNameByIndex(int index){
+        return customers.get(index).customerName;
+    }
+
+    public int getCustomerAddressIdByIndex(int index){
+        return customers.get(index).addressId;
+    }
+
     private void getAllCustomers(){
         final int CUSTOMER_ID = 1;
         final int CUSTOMER_NAME = 2;
+        final int ADDRESS_ID = 3;
         try {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT customerId, customerName FROM customer;");
+            ResultSet resultSet = statement.executeQuery("SELECT customerId, customerName, addressId FROM customer;");
 
             // checks that there are two columns returned by the database
             int columnCount = resultSet.getMetaData().getColumnCount();
-            if(columnCount != 2){
+            if(columnCount != 3){
                 throw new RuntimeException("customer data could not get customer id and customer name");
             }
 
             // adds all the customer data to the customer ArrayList
             customers.clear();
             while(resultSet.next()){
-                this.customers.add(new Customer(resultSet.getInt(CUSTOMER_ID), resultSet.getString(CUSTOMER_NAME)));
+                this.customers.add(new Customer(
+                        resultSet.getInt(CUSTOMER_ID),
+                        resultSet.getString(CUSTOMER_NAME),
+                        resultSet.getInt(ADDRESS_ID)
+                ));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Customer data was unavailable");

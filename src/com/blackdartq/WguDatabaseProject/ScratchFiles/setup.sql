@@ -45,6 +45,8 @@ CREATE TABLE city
   FOREIGN KEY (countryId) REFERENCES country (countryId) ON DELETE SET NULL ON UPDATE CASCADE
 );
 INSERT INTO city VALUE(null, 'American fork', 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+# SELECT * FROM city;
+# DELETE FROM city;
 
 CREATE TABLE address
 (
@@ -84,7 +86,7 @@ INSERT INTO customer VALUE(NULL, 'Test', 1, 1, CURDATE(), 'test', CURRENT_TIMEST
 INSERT INTO customer VALUE(NULL, 'Test2', 1, 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 INSERT INTO customer VALUE(NULL, 'Test3', 1, 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 
-# SELECT * from customer;
+#  SELECT * from customer;
 # delete from customer where customerId = 1;
 
 CREATE TABLE appointment

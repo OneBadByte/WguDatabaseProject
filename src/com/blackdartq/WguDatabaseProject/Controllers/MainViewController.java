@@ -1,6 +1,8 @@
 package com.blackdartq.WguDatabaseProject.Controllers;
 
+import com.blackdartq.WguDatabaseProject.DatabaseUtil.Address;
 import com.blackdartq.WguDatabaseProject.DatabaseUtil.AddressDB;
+import com.blackdartq.WguDatabaseProject.DatabaseUtil.City;
 import com.blackdartq.WguDatabaseProject.DatabaseUtil.CustomerDB;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -18,6 +20,23 @@ enum GridPanes {
 }
 
 public class MainViewController extends ControllerUtil {
+
+    enum Action{
+        ADD,
+        MODIFY
+    }
+
+    Action currentAction = Action.ADD;
+
+    /**
+     * Checks if the action being executed is adding or modifying data
+     * in the database
+     * @return
+     */
+    public boolean checkIfModifing(){
+        return currentAction == Action.MODIFY;
+    }
+
 
     // Database connections
     private CustomerDB customerDB = new CustomerDB();
@@ -66,6 +85,8 @@ public class MainViewController extends ControllerUtil {
     TextField customerPhoneNumberTextField;
     @FXML
     TextField customerAddressTextField;
+    @FXML
+    TextField customerAddress2TextField;
     @FXML
     TextField customerCityTextField;
     @FXML
@@ -169,7 +190,7 @@ public class MainViewController extends ControllerUtil {
 
 
     /**
-     *
+     * Switches between grids that the user can view
      */
     public void switchViabilityOfGridPane(GridPanes gridPanes) {
         switch (gridPanes) {
@@ -198,10 +219,35 @@ public class MainViewController extends ControllerUtil {
                 monthGridPane.setVisible(true);
                 break;
         }
+
+        // checks if the modify action is to be used in Customer pane
+        if (checkIfModifing() && gridPanes == GridPanes.CUSTOMER) {
+            addressDB.updateAllAddressData();
+            int index = getSelectedElementInListView(customerListView);
+            customerNameTextField.setText(customerDB.getCustomerNameByIndex(index));
+
+            // fills out address text fields
+            int addressId = customerDB.getCustomerAddressIdByIndex(index);
+            Address addressData = addressDB.getAddressFromAddressesById(addressId);
+            customerAddressTextField.setText(addressData.address);
+            customerPostalCodeTextField.setText(addressData.postalCode);
+            customerPhoneNumberTextField.setText(addressData.phone);
+
+            // fills out city text field
+            City cityData = addressDB.getCityFromCitiesByCityId(addressData.cityId);
+            customerCityTextField.setText(cityData.cityName);
+            countryChoiceBox.getSelectionModel().select(addressDB.getCountryNameFromCountriesById(cityData.countryId));
+        }
+    }
+
+    @FXML
+    public void onCancelButtonClicked(){
+        resetCustomerFields();
+        switchViabilityOfGridPane(GridPanes.MONTH);
     }
 
     /**
-     *
+     * changes month or week that the gridpanes are showing
      */
     @FXML
     public void onPrevButtonClicked() {
@@ -219,7 +265,7 @@ public class MainViewController extends ControllerUtil {
     // Customer controls
 
     /**
-     *
+     * Sends an alert to the user using the alert label
      */
     private void sendAnAlert(String message, ColorPicker colors) {
         alertLabel.setText(message);
@@ -239,18 +285,20 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *
+     * changes month or week that the gridpanes are showing
      */
     @FXML
     public void onAddCustomerButtonClicked() {
+        currentAction = Action.ADD;
         switchViabilityOfGridPane(GridPanes.CUSTOMER);
     }
 
     /**
-     *
+     * Changes to the customer pane and sets the current action to modify
      */
     @FXML
     public void onModifyCustomerButtonClicked() {
+        currentAction = Action.MODIFY;
         switchViabilityOfGridPane(GridPanes.CUSTOMER);
     }
 
@@ -306,22 +354,14 @@ public class MainViewController extends ControllerUtil {
 
 
     /**
-     *
+     * Handler for the customer save button
      */
     @FXML
     public void onCustomerSaveButtonClicked() {
-        //TODO add address
-        if(!checkAllCustomerFieldsFilledOut()){
+        if (!checkAllCustomerFieldsFilledOut()) {
             return;
         }
-        String customerName = customerNameTextField.getText();
-        sendAnAlert(customerName + " was added to the database", ColorPicker.YELLOW);
-        System.out.println(customerName);
-        if (customerName.equals("")) {
-            sendAnAlert("Enter a customer name please", ColorPicker.RED);
-            return;
-        }
-        customerDB.addCustomer(customerName, 1);
+        addCustomerDataToDatabase();
         fillOutListView(customerDB.getAllCustomerNames(), customerListView);
         resetCustomerFields();
         switchViabilityOfGridPane(GridPanes.MONTH);
@@ -342,9 +382,29 @@ public class MainViewController extends ControllerUtil {
     //++++++ com.blackdartq.WguDatabaseProject.FXML Control Helpers ++++++
 
     /**
-     *
+     * Saves all the customer info to the database
      */
-    public boolean checkAllCustomerFieldsFilledOut(){
+    public void addCustomerDataToDatabase() {
+        String customerName = customerNameTextField.getText();
+        String phoneNumber = customerPhoneNumberTextField.getText();
+        String address = customerAddressTextField.getText();
+        String city = customerCityTextField.getText();
+        int countryId = addressDB.getCountryIdByIndex(getSelectedElementInChoiceBox(countryChoiceBox));
+        String postalCode = customerPostalCodeTextField.getText();
+
+        // adding data to database tables
+        addressDB.addCity(city, countryId);
+        int cityId = addressDB.getCityId(city, countryId);
+        addressDB.addAddressToDatabase(address, address, cityId, postalCode, phoneNumber);
+        int addressId = addressDB.getAddressId(address, cityId, postalCode, phoneNumber);
+        customerDB.addCustomer(customerName, addressId);
+        sendAnAlert(customerName + " was added to the database", ColorPicker.YELLOW);
+    }
+
+    /**
+     * Checks that all the fields are filled out in the customer pane
+     */
+    public boolean checkAllCustomerFieldsFilledOut() {
         TextField[] textFields = {
                 customerNameTextField,
                 customerPhoneNumberTextField,
@@ -353,12 +413,12 @@ public class MainViewController extends ControllerUtil {
                 customerPostalCodeTextField,
         };
         boolean output = true;
-        for(TextField textField : textFields){
-            if(textField.getText().equals("")){
+        for (TextField textField : textFields) {
+            if (textField.getText().equals("")) {
                 textField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
                 sendAnAlert("Please fill in all fields", ColorPicker.RED);
                 output = false;
-            }else{
+            } else {
                 textField.setStyle("-fx-border-color: grey; -fx-background-color: white;");
             }
         }
@@ -366,10 +426,14 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *
+     * resets all the fields in the customer info pane
      */
     private void resetCustomerFields() {
         customerNameTextField.clear();
+        customerPostalCodeTextField.clear();
+        customerCityTextField.clear();
+        customerAddressTextField.clear();
+        customerPhoneNumberTextField.clear();
     }
 
     /**
@@ -421,8 +485,8 @@ public class MainViewController extends ControllerUtil {
      */
     private String getCompleteCurrentDate() {
         Calendar calendar = createCalendar();
-        System.out.println(new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime()));
-        return new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime());
+//        System.out.println(new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime()));
+        return new SimpleDateFormat("MM/YYYY").format(calendar.getTime());
     }
 
     /**

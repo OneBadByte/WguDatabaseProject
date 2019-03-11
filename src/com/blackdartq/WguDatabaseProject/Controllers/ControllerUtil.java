@@ -17,7 +17,7 @@ enum ColorPicker{
 }
 class CustomColors{
     final static String GREEN = " #439775";
-    final static String YELLOW = " ##ffff66";
+    final static String YELLOW = " #ffff66";
     final static String RED = "#FF7F7F";
 }
 
@@ -120,8 +120,8 @@ public class ControllerUtil<T> extends FxUtil{
     /**
      *
      */
-    public void getSelectedChoiceBox(ChoiceBox choiceBox){
-       choiceBox.getSelectionModel().getSelectedIndex();
+    public int getSelectedElementInChoiceBox(ChoiceBox choiceBox){
+       return choiceBox.getSelectionModel().getSelectedIndex();
     }
 
     /**

@@ -252,22 +252,25 @@
                               <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
                               <Label text="Customer Name" />
                               <Label text="Phone" GridPane.rowIndex="1" />
                               <Label text="Address" GridPane.rowIndex="2" />
-                              <Label text="City" GridPane.rowIndex="3" />
-                              <Label text="Country" GridPane.rowIndex="4" />
-                              <Button fx:id="customerSaveButton" mnemonicParsing="false" onMouseClicked="#onCustomerSaveButtonClicked" prefHeight="40.0" prefWidth="100.0" text="Save" textAlignment="CENTER" GridPane.rowIndex="6" />
-                              <Button fx:id="customerCancelButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" text="Cancel" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <Label text="City" GridPane.rowIndex="4" />
+                              <Label text="Country" GridPane.rowIndex="5" />
+                              <Button fx:id="customerSaveButton" mnemonicParsing="false" onMouseClicked="#onCustomerSaveButtonClicked" prefHeight="40.0" prefWidth="100.0" text="Save" textAlignment="CENTER" GridPane.rowIndex="7" />
+                              <Button fx:id="customerCancelButton" mnemonicParsing="false" onMouseClicked="#onCancelButtonClicked" prefHeight="40.0" prefWidth="100.0" text="Cancel" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                               <TextField fx:id="customerNameTextField" prefWidth="200.0" GridPane.columnIndex="1" />
                               <TextField fx:id="customerPhoneNumberTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label text="Postal Code" GridPane.rowIndex="5" />
+                              <Label text="Postal Code" GridPane.rowIndex="6" />
                               <TextField fx:id="customerAddressTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <TextField fx:id="customerCityTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <TextField fx:id="customerPostalCodeTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <ChoiceBox fx:id="countryChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <TextField fx:id="customerCityTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <TextField fx:id="customerPostalCodeTextField" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <ChoiceBox fx:id="countryChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <Label text="Address 2" GridPane.rowIndex="3" />
+                              <TextField fx:id="customerAddress2TextField" alignment="CENTER" prefHeight="26.0" prefWidth="198.0" promptText="Optional" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                            </children>
                            <padding>
                               <Insets right="20.0" />
