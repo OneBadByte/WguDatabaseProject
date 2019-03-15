@@ -1,7 +1,5 @@
 package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 
-import com.blackdartq.WguDatabaseProject.Controllers.ControllerUtil;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,7 +26,7 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
     }
 
     public ArrayList getAllCustomerIDs(){
-        getAllCustomers();
+        getAllCustomersFromDatabase();
        ArrayList<Integer> output = new ArrayList<>();
        for(Customer customer : customers){
            output.add(customer.customerId);
@@ -37,7 +35,7 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
     }
 
     public ArrayList getAllCustomerNames(){
-        getAllCustomers();
+        getAllCustomersFromDatabase();
         ArrayList<String> output = new ArrayList<>();
         for(Customer customer : customers){
             output.add(customer.customerName);
@@ -77,11 +75,15 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
         return customers.get(index).customerName;
     }
 
+    public int getCustomerIdByIndex(int index){
+        return customers.get(index).customerId;
+    }
+
     public int getCustomerAddressIdByIndex(int index){
         return customers.get(index).addressId;
     }
 
-    private void getAllCustomers(){
+    private void getAllCustomersFromDatabase(){
         final int CUSTOMER_ID = 1;
         final int CUSTOMER_NAME = 2;
         final int ADDRESS_ID = 3;
@@ -120,4 +122,41 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
             throw new RuntimeException("couldn't add customer");
         }
     }
+
+    /**
+     * Updates the users name
+     * TODO add address changing powers
+     */
+    public void updateCustomer(int customerId, String customerName){
+        PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement(
+                    "UPDATE customer SET customerName = ? WHERE customerId = ?"
+            );
+            statement.setString(1, customerName);
+            statement.setInt(2, customerId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("couldn't update customer information");
+        }
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

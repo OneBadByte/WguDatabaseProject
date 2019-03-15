@@ -22,6 +22,7 @@ public class AddressDB extends DatabaseUtil {
         getAddressesFromTheDatabase();
     }
 
+    //++++++++++++ COUNTRY METHODS +++++++++++++++++++++++++++
     /**
      * gets an ArrayList of the countries names
      */
@@ -75,10 +76,9 @@ public class AddressDB extends DatabaseUtil {
         }
     }
 
+    //++++++++++++ CITY METHODS +++++++++++++++++++++++++++
     /**
      * Adds a city to the database
-     * @param city
-     * @param countryId
      */
     public void addCity(String city, int countryId){
         try {
@@ -90,6 +90,52 @@ public class AddressDB extends DatabaseUtil {
 //            e.printStackTrace();
             throw new RuntimeException("Couldn't add city to the database");
         }
+    }
+
+    /**
+     * Modifies a city
+     */
+    public void updateCity(int cityId, String city, int countryId){
+        try {
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE city SET city = ?, countryId = ? WHERE cityId= ?;"
+        );
+            statement.setString(1, city);
+            statement.setInt(2, countryId);
+            statement.setInt(3, cityId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("couldn't update city in database");
+        }
+    }
+
+    /**
+     * Modifies a city by using a city object
+     */
+    public void updateCity(City city){
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE city SET city = ?, countryId = ? WHERE cityId= ?;"
+            );
+            statement.setString(1, city.cityName);
+            statement.setInt(2, city.countryId);
+            statement.setInt(3, city.cityId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("couldn't update city in database");
+        }
+    }
+
+    /**
+     * Returns a city from cities using its id
+     */
+    public City getCityFromCitiesById(int id){
+        for(City city : cities){
+            if(city.cityId == id){
+                return city;
+            }
+        }
+        throw new RuntimeException("couldn't retrieve city in cities");
     }
 
     /**
@@ -126,6 +172,18 @@ public class AddressDB extends DatabaseUtil {
     }
 
     /**
+     * gets the city's ID by using the address ID
+     */
+    public int getCityIdFromByAddressId(int addressId){
+        for(Address address : addresses){
+            if(addressId == address.addressId){
+                return address.cityId;
+            }
+        }
+        throw new RuntimeException("couldn't get city id with address id");
+    }
+
+    /**
      * Gets all the cities from the database and loads them into cities
      */
     private void getCitiesFromDatabase(){
@@ -149,6 +207,8 @@ public class AddressDB extends DatabaseUtil {
         }
     }
 
+    //++++++++++++ ADDRESS METHODS +++++++++++++++++++++++++++
+
     /**
      * Adds an address to the database
      */
@@ -171,7 +231,6 @@ public class AddressDB extends DatabaseUtil {
     /**
      * Gets all the addresses from the database
      */
-
     public void getAddressesFromTheDatabase(){
         final int ADDRESS_ID = 1;
         final int ADDRESS = 2;
@@ -198,6 +257,7 @@ public class AddressDB extends DatabaseUtil {
             throw new RuntimeException("Couldn't get address from the database");
         }
     }
+
 
     /**
      * gets the addresses ID from address data
@@ -232,6 +292,27 @@ public class AddressDB extends DatabaseUtil {
             }
         }
         throw new RuntimeException("couldn't find address in addresses");
+    }
+
+    /**
+     * Updates address information
+     */
+    public void updateAddress(Address address){
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE address " +
+                            "SET address = ?, address2 = ?, postalCode = ?, phone = ?" +
+                            " WHERE addressId = ?;"
+            );
+            statement.setString(1 , address.address);
+            statement.setString(2 , address.address2);
+            statement.setString(3 , address.postalCode);
+            statement.setString(4 , address.phone);
+            statement.setInt(5, address.addressId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Couldn't update address in database");
+        }
     }
 }
 

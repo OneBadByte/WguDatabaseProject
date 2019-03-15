@@ -45,6 +45,7 @@ CREATE TABLE city
   FOREIGN KEY (countryId) REFERENCES country (countryId) ON DELETE SET NULL ON UPDATE CASCADE
 );
 INSERT INTO city VALUE(null, 'American fork', 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+# ALTER TABLE city WHERE
 # SELECT * FROM city;
 # DELETE FROM city;
 

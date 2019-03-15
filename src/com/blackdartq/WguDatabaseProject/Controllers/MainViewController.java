@@ -1,9 +1,7 @@
 package com.blackdartq.WguDatabaseProject.Controllers;
 
-import com.blackdartq.WguDatabaseProject.DatabaseUtil.Address;
-import com.blackdartq.WguDatabaseProject.DatabaseUtil.AddressDB;
-import com.blackdartq.WguDatabaseProject.DatabaseUtil.City;
-import com.blackdartq.WguDatabaseProject.DatabaseUtil.CustomerDB;
+import com.blackdartq.WguDatabaseProject.DatabaseUtil.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -41,6 +39,7 @@ public class MainViewController extends ControllerUtil {
     // Database connections
     private CustomerDB customerDB = new CustomerDB();
     private AddressDB addressDB = new AddressDB();
+    private AppointmentDB appointmentDB = new AppointmentDB();
 
     // used to change the month for the calendars
     private int monthMultiplier = 0;
@@ -56,11 +55,11 @@ public class MainViewController extends ControllerUtil {
      */
     public void initialize() {
 //        generateCalendar();
-        loadMonthGridPane();
+        generateMonthGridPane();
 
         // loads data for the customer and appointment list views
         fillOutListView(customerDB.getAllCustomerNames(), customerListView);
-        fillOutListView(customerDB.getAllCustomerIDs(), appointmentListView);
+        fillOutListView(appointmentDB.getAppointmentTitles(), appointmentListView);
         fillOutChoiceBox(countryChoiceBox, addressDB.getCountries());
 
 //        customerDB.dropTables();
@@ -121,7 +120,7 @@ public class MainViewController extends ControllerUtil {
      *
      */
     @FXML
-    public void loadMonthGridPane() {
+    public void generateMonthGridPane() {
         // changes which gridpane is being viewed
         switchViabilityOfGridPane(GridPanes.MONTH);
 
@@ -177,10 +176,10 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *
+     * generates the week gridpane by adding labels into the cells
      */
     @FXML
-    public void loadWeekGridPane() {
+    public void generateWeekGridPane() {
         switchViabilityOfGridPane(GridPanes.WEEK);
         monthWeekLabel.setText(getWeekDayRange());
         for (int i = 1; i < 8; i++) {
@@ -223,7 +222,7 @@ public class MainViewController extends ControllerUtil {
         // checks if the modify action is to be used in Customer pane
         if (checkIfModifing() && gridPanes == GridPanes.CUSTOMER) {
             addressDB.updateAllAddressData();
-            int index = getSelectedElementInListView(customerListView);
+            int index = getIndexInListView(customerListView);
             customerNameTextField.setText(customerDB.getCustomerNameByIndex(index));
 
             // fills out address text fields
@@ -240,6 +239,9 @@ public class MainViewController extends ControllerUtil {
         }
     }
 
+    /**
+     * Handles the cancel buttons for both customer and appointment
+     */
     @FXML
     public void onCancelButtonClicked(){
         resetCustomerFields();
@@ -254,11 +256,11 @@ public class MainViewController extends ControllerUtil {
         if (monthGridPane.isVisible()) {
             monthMultiplier--;
             clearGridPane(monthGridPane);
-            loadMonthGridPane();
+            generateMonthGridPane();
         } else {
             weekMultiplier--;
             clearGridPane(weekGridPane);
-            loadWeekGridPane();
+            generateWeekGridPane();
         }
     }
 
@@ -303,7 +305,7 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *
+     * Deletes a customer from the database
      */
     @FXML
     public void onDeleteCustomerButtonClicked() {
@@ -311,14 +313,15 @@ public class MainViewController extends ControllerUtil {
             return;
         }
         // deletes the index from the database
-        customerDB.deleteCustomerByIndex(getSelectedElementInListView(customerListView));
+        customerDB.deleteCustomerByIndex(getIndexInListView(customerListView));
         // clears and refills the listview
         customerListView.getItems().clear();
         fillOutListView(customerDB.getAllCustomerNames(), customerListView);
 //        customerDB.dropTables();
     }
 
-    // Appointment controls
+
+    //+++++++++++++++++++++ Appointment controls ++++++++++++++++++++++++++
 
     /**
      *
@@ -337,6 +340,17 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
+     * Handler for deleting appointments based on index in appointment listview
+     */
+    @FXML
+    public void onDeleteAppointmentButtonClicked(){
+        int index = getIndexInListView(appointmentListView);
+        appointmentDB.deleteByIndex(index);
+        appointmentDB.getAppointmentsFromDatabase();
+        fillOutListView(appointmentDB.getAppointmentTitles(), appointmentListView);
+    }
+
+    /**
      *
      */
     @FXML
@@ -344,11 +358,11 @@ public class MainViewController extends ControllerUtil {
         if (monthGridPane.isVisible()) {
             monthMultiplier++;
             clearGridPane(monthGridPane);
-            loadMonthGridPane();
+            generateMonthGridPane();
         } else {
             weekMultiplier++;
             clearGridPane(weekGridPane);
-            loadWeekGridPane();
+            generateWeekGridPane();
         }
     }
 
@@ -361,7 +375,13 @@ public class MainViewController extends ControllerUtil {
         if (!checkAllCustomerFieldsFilledOut()) {
             return;
         }
-        addCustomerDataToDatabase();
+        if(checkIfModifing()){
+            modifyCustomerDataToDatabase();
+        }else{
+            addCustomerDataToDatabase();
+        }
+
+        // fills out the list views with updated data
         fillOutListView(customerDB.getAllCustomerNames(), customerListView);
         resetCustomerFields();
         switchViabilityOfGridPane(GridPanes.MONTH);
@@ -369,28 +389,59 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *
+     * Drops every table in the database
      */
     @FXML
     public void deleteDatabase() {
         customerDB.dropTables();
         sendAnAlert("deleting database!!!", ColorPicker.RED);
+        Platform.exit();
     }
-
     //---------------------------
 
     //++++++ com.blackdartq.WguDatabaseProject.FXML Control Helpers ++++++
 
     /**
+     * Saves modifies the customer info to the database
+     */
+    public void modifyCustomerDataToDatabase() {
+        // Updates the customer portion of the database
+        String customerName = customerNameTextField.getText();
+        int selectedIndex = getIndexInListView(customerListView);
+        int customerId = customerDB.getCustomerIdByIndex(selectedIndex);
+        customerDB.updateCustomer(customerId, customerName);
+
+        // Updates the address portion of the database
+        Address address = addressDB.getAddressFromAddressesById(
+                customerDB.getCustomerAddressIdByIndex(selectedIndex)
+        );
+        address.address = customerAddressTextField.getText();
+        address.address2 = customerAddress2TextField.getText();
+        address.postalCode = customerPostalCodeTextField.getText();
+        address.phone = customerPhoneNumberTextField.getText();
+        addressDB.updateAddress(address);
+
+        // Updates the city portion of the database
+        City city = addressDB.getCityFromCitiesByCityId(address.cityId);
+        city.cityName = customerCityTextField.getText();
+        int countryId = addressDB.getCountryIdByIndex(getIndexInChoiceBox(countryChoiceBox));
+        city.countryId = countryId;
+        addressDB.updateCity(city);
+
+        // adding data to database tables
+    }
+
+    /**
      * Saves all the customer info to the database
      */
     public void addCustomerDataToDatabase() {
+        // gets data from text fields
         String customerName = customerNameTextField.getText();
         String phoneNumber = customerPhoneNumberTextField.getText();
         String address = customerAddressTextField.getText();
         String city = customerCityTextField.getText();
-        int countryId = addressDB.getCountryIdByIndex(getSelectedElementInChoiceBox(countryChoiceBox));
         String postalCode = customerPostalCodeTextField.getText();
+        int countryId = addressDB.getCountryIdByIndex(getIndexInChoiceBox(countryChoiceBox));
 
         // adding data to database tables
         addressDB.addCity(city, countryId);
@@ -437,16 +488,17 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *
+     *  Creates a new calendar to be used in other functions
      */
     private Calendar createCalendar() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + monthMultiplier);
+        calendar.set(Calendar.WEEK_OF_MONTH, calendar.get(Calendar.WEEK_OF_MONTH) + weekMultiplier);
         return calendar;
     }
 
     /**
-     *
+     *  Creates a new calendar to be used in other functions but with changes
      */
     private Calendar createCalendar(int monthDelta, int weekDelta) {
         Calendar calendar = Calendar.getInstance();
@@ -456,10 +508,11 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *
+     * Creates a string of the week for the weekMonthLabel
      */
     private String getWeekDayRange() {
-        return getDateFromWeekDay(Calendar.SUNDAY) + " - " + getDateFromWeekDay(Calendar.SATURDAY);
+        Calendar calendar = createCalendar();
+        return getDateFromWeekDay(calendar.get(Calendar.SUNDAY)) + " - " + getDateFromWeekDay(calendar.get(Calendar.SATURDAY));
     }
 
     /**
@@ -524,7 +577,7 @@ public class MainViewController extends ControllerUtil {
         for (Label label : this.labelArrayList) {
             gridPane.getChildren().remove(label);
         }
-//        loadMonthGridPane();
+//        generateMonthGridPane();
     }
 
     /**

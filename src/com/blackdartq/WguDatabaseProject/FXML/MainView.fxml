@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
@@ -89,7 +90,7 @@
                                           <Font size="12.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="deleteAppointmentButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="64.0" style="-fx-background-color: #439775#439775;" text="Delete" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+                                    <Button fx:id="deleteAppointmentButton" mnemonicParsing="false" onMouseClicked="#onDeleteAppointmentButtonClicked" prefHeight="26.0" prefWidth="64.0" style="-fx-background-color: #439775#439775;" text="Delete" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                                        <font>
                                           <Font size="12.0" />
                                        </font>
@@ -106,8 +107,8 @@
                <children>
                   <HBox alignment="CENTER_LEFT" focusTraversable="true" layoutY="7.0" prefHeight="40.0" prefWidth="890.0" spacing="10.0">
                      <children>
-                        <Button mnemonicParsing="false" onMouseClicked="#loadWeekGridPane" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #fffdf9;" text="Week View" />
-                        <Button mnemonicParsing="false" onMouseClicked="#loadMonthGridPane" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #fffdf9;" text="Month View">
+                        <Button mnemonicParsing="false" onMouseClicked="#generateWeekGridPane" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #fffdf9;" text="Week View" />
+                        <Button mnemonicParsing="false" onMouseClicked="#generateMonthGridPane" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #fffdf9;" text="Month View">
                            <HBox.margin>
                               <Insets right="34.0" />
                            </HBox.margin>
@@ -236,8 +237,61 @@
                         </Label>
                      </children>
                   </GridPane>
-                  <Pane fx:id="appointmentPane" layoutX="14.0" layoutY="56.0" prefHeight="676.0" prefWidth="860.0" style="-fx-background-color: white;" visible="false" />
-                  <Pane fx:id="customerPane" layoutX="19.0" layoutY="62.0" prefHeight="667.0" prefWidth="860.0">
+                  <Pane fx:id="appointmentPane" layoutX="14.0" layoutY="56.0" prefHeight="676.0" prefWidth="860.0" style="-fx-background-color: #48bf84;">
+                     <children>
+                        <GridPane layoutX="127.0" layoutY="69.0" prefHeight="537.0" prefWidth="606.0" style="-fx-background-color: white; -fx-border-color: #439775;">
+                           <columnConstraints>
+                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints fillWidth="false" halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Customer Name" />
+                              <Label text="Title" GridPane.rowIndex="1" />
+                              <Label prefHeight="16.0" prefWidth="67.0" text="Customer" GridPane.rowIndex="2" />
+                              <Label text="Location" GridPane.rowIndex="4" />
+                              <Label text="Contact" GridPane.rowIndex="5" />
+                              <Button fx:id="customerSaveButton1" mnemonicParsing="false" onMouseClicked="#onCustomerSaveButtonClicked" prefHeight="40.0" prefWidth="100.0" text="Save" textAlignment="CENTER" GridPane.rowIndex="10" />
+                              <Button fx:id="customerCancelButton1" mnemonicParsing="false" onMouseClicked="#onCancelButtonClicked" prefHeight="40.0" prefWidth="100.0" text="Cancel" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                              <TextField fx:id="customerNameTextField1" prefWidth="200.0" GridPane.columnIndex="1" />
+                              <TextField fx:id="customerPhoneNumberTextField1" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="Type" GridPane.rowIndex="6" />
+                              <TextField fx:id="customerAddressTextField1" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="customerCityTextField1" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <TextField fx:id="customerPostalCodeTextField1" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                              <ChoiceBox fx:id="countryChoiceBox1" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <Label text="Description" GridPane.rowIndex="3" />
+                              <TextField fx:id="customerAddress2TextField1" alignment="CENTER" prefHeight="26.0" prefWidth="198.0" promptText="Optional" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="Url" GridPane.rowIndex="7" />
+                              <Label text="Start" GridPane.rowIndex="8" />
+                              <Label text="End" GridPane.rowIndex="9" />
+                              <DatePicker GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                              <DatePicker GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                              <TextField GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                           </children>
+                           <padding>
+                              <Insets right="20.0" />
+                           </padding>
+                        </GridPane>
+                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="126.0" layoutY="29.0" prefHeight="40.0" prefWidth="606.0" style="-fx-background-color: #439775;" text="Appointment Info" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="31.0" />
+                           </font>
+                        </Label>
+                     </children></Pane>
+                  <Pane fx:id="customerPane" layoutX="19.0" layoutY="62.0" prefHeight="667.0" prefWidth="860.0" visible="false">
                      <children>
                         <GridPane layoutX="127.0" layoutY="77.0" prefHeight="515.0" prefWidth="606.0" style="-fx-background-color: white; -fx-border-color: #439775;">
                           <columnConstraints>

@@ -120,7 +120,7 @@ public class ControllerUtil<T> extends FxUtil{
     /**
      *
      */
-    public int getSelectedElementInChoiceBox(ChoiceBox choiceBox){
+    public int getIndexInChoiceBox(ChoiceBox choiceBox){
        return choiceBox.getSelectionModel().getSelectedIndex();
     }
 
@@ -135,7 +135,7 @@ public class ControllerUtil<T> extends FxUtil{
     /**
      *
      */
-    public int getSelectedElementInListView(ListView listView){
+    public int getIndexInListView(ListView listView){
         int test = listView.getSelectionModel().getSelectedIndex();
         System.out.println("selected row: " + test);
         return test;
