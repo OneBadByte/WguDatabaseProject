@@ -114,3 +114,4 @@ CREATE TABLE appointment
 INSERT INTO appointment VALUE(NULL, 1, 1, 'test wants something', 'testing', 'testing location', 'testing contract', 'testing type', 'http://youtube.com', CURDATE(), CURDATE(), CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 
 
+

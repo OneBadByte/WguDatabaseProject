@@ -19,7 +19,7 @@ enum GridPanes {
 
 public class MainViewController extends ControllerUtil {
 
-    enum Action{
+    enum Action {
         ADD,
         MODIFY
     }
@@ -29,9 +29,10 @@ public class MainViewController extends ControllerUtil {
     /**
      * Checks if the action being executed is adding or modifying data
      * in the database
+     *
      * @return
      */
-    public boolean checkIfModifing(){
+    public boolean checkIfModifing() {
         return currentAction == Action.MODIFY;
     }
 
@@ -61,6 +62,7 @@ public class MainViewController extends ControllerUtil {
         fillOutListView(customerDB.getAllCustomerNames(), customerListView);
         fillOutListView(appointmentDB.getAppointmentTitles(), appointmentListView);
         fillOutChoiceBox(countryChoiceBox, addressDB.getCountries());
+        fillOutChoiceBox(appointmentCustomerNameChoiceBox, customerDB.getAllCustomerNames());
 
 //        customerDB.dropTables();
     }
@@ -73,9 +75,17 @@ public class MainViewController extends ControllerUtil {
     @FXML
     Label alertLabel;
 
-    // split menu button
+    // Date Picker
+    @FXML
+    DatePicker appointmentStartDatePicker;
+    @FXML
+    DatePicker appointmentEndDatePicker;
+
+    // split choice box
     @FXML
     ChoiceBox countryChoiceBox;
+    @FXML
+    ChoiceBox appointmentCustomerNameChoiceBox;
 
     // Text Fields
     @FXML
@@ -91,11 +101,35 @@ public class MainViewController extends ControllerUtil {
     @FXML
     TextField customerPostalCodeTextField;
 
+    @FXML
+    TextField appointmentTitleTextField;
+    @FXML
+    TextField appointmentUrlTextField;
+    @FXML
+    TextField appointmentStartTextField;
+    @FXML
+    TextField appointmentEndTextField;
+
+    // Text Areas
+    @FXML
+    TextArea appointmentDescriptionTextArea;
+    @FXML
+    TextArea appointmentLocationTextArea;
+    @FXML
+    TextArea appointmentContactTextArea;
+    @FXML
+    TextArea appointmentTypeTextArea;
+
     // Buttons
     @FXML
     Button customerSaveButton;
     @FXML
     Button customerCancelButton;
+
+    @FXML
+    Button appointmentSaveButton;
+    @FXML
+    Button appointmentCancelButton;
 
     // Panes
     @FXML
@@ -117,7 +151,7 @@ public class MainViewController extends ControllerUtil {
     //++++++ com.blackdartq.WguDatabaseProject.FXML Control functions ++++++
 
     /**
-     *
+     * Generates the labels in the month grid pane
      */
     @FXML
     public void generateMonthGridPane() {
@@ -232,10 +266,13 @@ public class MainViewController extends ControllerUtil {
             customerPostalCodeTextField.setText(addressData.postalCode);
             customerPhoneNumberTextField.setText(addressData.phone);
 
-            // fills out city text field
+            // fills out city text fields
             City cityData = addressDB.getCityFromCitiesByCityId(addressData.cityId);
             customerCityTextField.setText(cityData.cityName);
-            countryChoiceBox.getSelectionModel().select(addressDB.getCountryNameFromCountriesById(cityData.countryId));
+
+            // fills out country fields
+            String countryName = addressDB.getCountryNameFromCountriesById(cityData.countryId);
+            countryChoiceBox.getSelectionModel().select(countryName);
         }
     }
 
@@ -243,8 +280,9 @@ public class MainViewController extends ControllerUtil {
      * Handles the cancel buttons for both customer and appointment
      */
     @FXML
-    public void onCancelButtonClicked(){
+    public void onCancelButtonClicked() {
         resetCustomerFields();
+        resetAppointmentFields();
         switchViabilityOfGridPane(GridPanes.MONTH);
     }
 
@@ -264,7 +302,7 @@ public class MainViewController extends ControllerUtil {
         }
     }
 
-    // Customer controls
+    //+++++++++++++++++ Customer controls ++++++++++++++++++++++++
 
     /**
      * Sends an alert to the user using the alert label
@@ -320,38 +358,122 @@ public class MainViewController extends ControllerUtil {
 //        customerDB.dropTables();
     }
 
+    /**
+     * Handler for the customer save button
+     */
+    @FXML
+    public void onCustomerSaveButtonClicked() {
+        if (!checkAllCustomerFieldsFilledOut()) {
+            return;
+        }
+        if (checkIfModifing()) {
+            modifyCustomerDataToDatabase();
+        } else {
+            addCustomerDataToDatabase();
+        }
+
+        // fills out the list views with updated data
+        fillOutListView(customerDB.getAllCustomerNames(), customerListView);
+        resetCustomerFields();
+        switchViabilityOfGridPane(GridPanes.MONTH);
+        sendAnAlert("", ColorPicker.GREEN);
+    }
+
 
     //+++++++++++++++++++++ Appointment controls ++++++++++++++++++++++++++
+
+    /**
+     * Loads customer names into the choice box
+     */
+    @FXML
+    public void onCustomerNameChoiceBoxClicked(){
+        fillOutChoiceBox(appointmentCustomerNameChoiceBox, customerDB.getAllCustomerNames());
+    }
 
     /**
      *
      */
     @FXML
     public void onAddAppointmentButtonClicked() {
+        currentAction = Action.ADD;
         switchViabilityOfGridPane(GridPanes.APPOINTMENT);
     }
 
     /**
-     *
+     * loads up all fields when the appointment modify buttons clicked
      */
     @FXML
     public void onModifyAppointmentButtonClicked() {
+        currentAction = Action.MODIFY;
+        int appointmentIndex = getIndexInListView(appointmentListView);
+        Appointment appointment = appointmentDB.getAppointmentFromIndex(appointmentIndex);
+        appointmentTitleTextField.setText(appointment.title);
+        appointmentUrlTextField.setText(appointment.url);
+//        appointmentStartTextField.setText(appointment.url);
+//        appointmentStartTextField.setText(appointment.);
+        appointmentDescriptionTextArea.setText(appointment.description);
+        appointmentLocationTextArea.setText(appointment.location);
+        appointmentContactTextArea.setText(appointment.contact);
+        appointmentTypeTextArea.setText(appointment.type);
+        int customerIndex = customerDB.getCustomerIndexById(appointment.customerId);
+        appointmentCustomerNameChoiceBox.getSelectionModel().select(customerIndex);
+
         switchViabilityOfGridPane(GridPanes.APPOINTMENT);
+    }
+
+    /**
+     * handles saving appointment data gathering and saving to the database
+     */
+    @FXML
+    public void onAppointmentSaveButtonClicked(){
+        // checks that all the fields are filled out
+        if(!checkAllAppointmentFieldsFilledOut()){
+           return;
+        }
+        if(checkIfModifing()){
+            int appointmentIndex = getIndexInListView(appointmentListView);
+            Appointment appointment = appointmentDB.getAppointmentFromIndex(appointmentIndex);
+            int customer_index = getIndexInChoiceBox(appointmentCustomerNameChoiceBox);
+            appointment.customerId = customerDB.getCustomerIdByIndex(customer_index);
+            appointment.title = appointmentTitleTextField.getText();
+            appointment.description = appointmentDescriptionTextArea.getText();
+            appointment.location = appointmentLocationTextArea.getText();
+            appointment.contact = appointmentContactTextArea.getText();
+            appointment.type = appointmentTypeTextArea.getText();
+            appointmentDB.updateAppointment(appointment);
+        }else{
+            // Gets all the data from the UI and saves to the database
+            Appointment appointment = new Appointment();
+            int customer_index = getIndexInChoiceBox(appointmentCustomerNameChoiceBox);
+            appointment.customerId = customerDB.getCustomerIdByIndex(customer_index);
+            appointment.title = appointmentTitleTextField.getText();
+            appointment.description = appointmentDescriptionTextArea.getText();
+            appointment.location = appointmentLocationTextArea.getText();
+            appointment.contact = appointmentContactTextArea.getText();
+            appointment.type = appointmentTypeTextArea.getText();
+            appointmentDB.addAppointment(appointment);
+        }
+        // fills out appointment list view and switch to the month gridpane
+        fillOutListView(appointmentDB.getAppointmentTitles(), appointmentListView);
+        switchViabilityOfGridPane(GridPanes.MONTH);
+        sendAnAlert("", ColorPicker.GREEN);
     }
 
     /**
      * Handler for deleting appointments based on index in appointment listview
      */
     @FXML
-    public void onDeleteAppointmentButtonClicked(){
+    public void onDeleteAppointmentButtonClicked() {
         int index = getIndexInListView(appointmentListView);
         appointmentDB.deleteByIndex(index);
         appointmentDB.getAppointmentsFromDatabase();
         fillOutListView(appointmentDB.getAppointmentTitles(), appointmentListView);
     }
 
+    // ++++++++++++++++++++++++ Calendar controls ++++++++++++++++++++++++++++++++
+
     /**
-     *
+     * Changes the data generated into the calendar grid panes
      */
     @FXML
     public void onNextButtonClicked() {
@@ -366,27 +488,6 @@ public class MainViewController extends ControllerUtil {
         }
     }
 
-
-    /**
-     * Handler for the customer save button
-     */
-    @FXML
-    public void onCustomerSaveButtonClicked() {
-        if (!checkAllCustomerFieldsFilledOut()) {
-            return;
-        }
-        if(checkIfModifing()){
-            modifyCustomerDataToDatabase();
-        }else{
-            addCustomerDataToDatabase();
-        }
-
-        // fills out the list views with updated data
-        fillOutListView(customerDB.getAllCustomerNames(), customerListView);
-        resetCustomerFields();
-        switchViabilityOfGridPane(GridPanes.MONTH);
-        sendAnAlert("", ColorPicker.GREEN);
-    }
 
     /**
      * Drops every table in the database
@@ -424,8 +525,7 @@ public class MainViewController extends ControllerUtil {
         // Updates the city portion of the database
         City city = addressDB.getCityFromCitiesByCityId(address.cityId);
         city.cityName = customerCityTextField.getText();
-        int countryId = addressDB.getCountryIdByIndex(getIndexInChoiceBox(countryChoiceBox));
-        city.countryId = countryId;
+        city.countryId = addressDB.getCountryIdByIndex(getIndexInChoiceBox(countryChoiceBox));
         addressDB.updateCity(city);
 
         // adding data to database tables
@@ -450,6 +550,37 @@ public class MainViewController extends ControllerUtil {
         int addressId = addressDB.getAddressId(address, cityId, postalCode, phoneNumber);
         customerDB.addCustomer(customerName, addressId);
         sendAnAlert(customerName + " was added to the database", ColorPicker.YELLOW);
+    }
+
+    /**
+     * Checks that all the fields are filled out in the customer pane
+     */
+    private boolean checkAllAppointmentFieldsFilledOut() {
+        boolean output = true;
+        TextField[] textFields = {
+                appointmentTitleTextField,
+//                appointmentUrlTextField,
+                appointmentStartTextField,
+                appointmentEndTextField
+        };
+
+//        TextArea[] textAreas = {
+//                appointmentDescriptionTextArea,
+//                appointmentContactTextArea,
+//                appointmentLocationTextArea,
+//                appointmentTypeTextArea
+//        };
+
+        for (TextField textField : textFields) {
+            if (textField.getText().equals("")) {
+                textField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
+                sendAnAlert("Please fill in all fields", ColorPicker.RED);
+                output = false;
+            } else {
+                textField.setStyle("-fx-border-color: grey; -fx-background-color: white;");
+            }
+        }
+        return output;
     }
 
     /**
@@ -488,7 +619,22 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *  Creates a new calendar to be used in other functions
+     * resets all the fields in the customer info pane
+     */
+    private void resetAppointmentFields() {
+        appointmentTitleTextField.clear();
+        appointmentUrlTextField.clear();
+        appointmentStartTextField.clear();
+        appointmentEndTextField.clear();
+
+        appointmentDescriptionTextArea.clear();
+        appointmentLocationTextArea.clear();
+        appointmentContactTextArea.clear();
+        appointmentTypeTextArea.clear();
+    }
+
+    /**
+     * Creates a new calendar to be used in other functions
      */
     private Calendar createCalendar() {
         Calendar calendar = Calendar.getInstance();
@@ -498,7 +644,7 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *  Creates a new calendar to be used in other functions but with changes
+     * Creates a new calendar to be used in other functions but with changes
      */
     private Calendar createCalendar(int monthDelta, int weekDelta) {
         Calendar calendar = Calendar.getInstance();

@@ -43,13 +43,24 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
         return output;
     }
 
+    public int getCustomerIndexById(int id){
+        int output = 0;
+        for(Customer customer : customers){
+            if(customer.customerId == id){
+                return output;
+            }
+            output++;
+        }
+        throw new RuntimeException("couldn't retrieve customer index by id");
+    }
+
     @Override
     public void deleteById(int id) {
         for(Customer customer : customers){
             if(customer.customerId == id){
                 try {
                     PreparedStatement statement = connection.prepareStatement("DELETE FROM customer WHERE customerId = ?");
-                    System.out.println("deleting id: " + id);
+//                    System.out.println("deleting id: " + id);
                     statement.setInt(1, id);
                     statement.execute();
                 } catch (SQLException e) {

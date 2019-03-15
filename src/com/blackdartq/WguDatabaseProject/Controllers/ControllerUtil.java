@@ -55,7 +55,7 @@ class FxUtil{
     }
 
     /**
-     *
+     * Changes the scenes of the entire program
      */
     public void changeSceneTo(String fxmlFile, Object controller, Control control){
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
@@ -66,8 +66,7 @@ class FxUtil{
             stage.setScene(new Scene(parent));
             stage.show();
         } catch (IOException e) {
-            System.out.println(e);
-            return;
+            throw new RuntimeException("couldn't change scene");
         }
     }
 }
@@ -137,7 +136,6 @@ public class ControllerUtil<T> extends FxUtil{
      */
     public int getIndexInListView(ListView listView){
         int test = listView.getSelectionModel().getSelectedIndex();
-        System.out.println("selected row: " + test);
         return test;
     }
 }

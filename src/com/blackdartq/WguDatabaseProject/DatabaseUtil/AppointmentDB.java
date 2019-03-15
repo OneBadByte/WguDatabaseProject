@@ -6,36 +6,60 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-class Appointment{
-    public int appointmentId;
-    public int customerId;
-    public int userId;
-    public String title;
-    public String description;
-    public String location;
-    public String contact;
-    public String type;
-    public String url;
-    // TODO add start and end date times
-
-
-    public Appointment(int appointmentId, int customerId, int userId, String title, String description, String location, String contact, String type, String url) {
-        this.appointmentId = appointmentId;
-        this.customerId = customerId;
-        this.userId = userId;
-        this.title = title;
-        this.description = description;
-        this.location = location;
-        this.contact = contact;
-        this.type = type;
-        this.url = url;
-    }
-}
-
 public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
     private ArrayList<Appointment> appointments = new ArrayList<>();
-
     public AppointmentDB(){
+        getAppointmentsFromDatabase();
+    }
+
+    /**
+     * Modifies an appointment in the database
+     */
+    public void updateAppointment(Appointment appointment){
+        PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement(
+                    "UPDATE appointment " +
+                            "SET customerId = ?, title = ?, description = ?, location = ?, contact = ?, " +
+                            "type = ?, url = ? " +
+                            "WHERE appointmentId = ?;"
+            );
+            statement.setInt(1, appointment.customerId);
+            statement.setString(2, appointment.title);
+            statement.setString(3, appointment.description);
+            statement.setString(4, appointment.location);
+            statement.setString(5, appointment.contact);
+            statement.setString(6, appointment.type);
+            statement.setString(7, appointment.url);
+            statement.setInt(8, appointment.appointmentId);
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Couldn't update appointment in the database");
+        }
+    }
+
+    /**
+     * adds an appointment to the database
+     */
+    public void addAppointment(Appointment appointment){
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO appointment VALUE(NULL, ?, 1, ?, ?, ?, ?, ?, ?, " +
+                            "CURDATE(), CURDATE(), " +
+                            "CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');"
+            );
+            statement.setInt(1, appointment.customerId);
+            statement.setString(2, appointment.title);
+            statement.setString(3, appointment.description);
+            statement.setString(4, appointment.location);
+            statement.setString(5, appointment.contact);
+            statement.setString(6, appointment.type);
+            statement.setString(7, appointment.url);
+            statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException("Couldn't add appointment to the database");
+        }
         getAppointmentsFromDatabase();
     }
 
@@ -76,10 +100,22 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
         }
     }
 
+    /**
+     * Get the appointment id from appointments by index
+     */
     public int getAppointmentIdFromIndex(int index){
         return appointments.get(index).appointmentId;
     }
+    /**
+     * Get the appointment id from appointments by index
+     */
+    public Appointment getAppointmentFromIndex(int index){
+        return appointments.get(index);
+    }
 
+    /**
+     * gets the titles of all the appointments in the database
+     */
     public ArrayList getAppointmentTitles(){
         ArrayList<String> output = new ArrayList<>();
         for(Appointment appointment : appointments){
