@@ -64,6 +64,21 @@ public class MainViewController extends ControllerUtil {
         fillOutChoiceBox(countryChoiceBox, addressDB.getCountries());
         fillOutChoiceBox(appointmentCustomerNameChoiceBox, customerDB.getAllCustomerNames());
 
+        Runnable r = () -> {
+            while (true) {
+                if (appointmentDB.checkAppointmentStartTimes()) {
+                    sendAnAlert("appointment starts soon", ColorPicker.YELLOW);
+                }
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException("couldn't sleep?");
+                }
+            }
+//            throw new RuntimeException("Alert thread died");
+        };
+        Thread thread = new Thread(r);
+        thread.start();
 //        customerDB.dropTables();
     }
 
@@ -308,7 +323,9 @@ public class MainViewController extends ControllerUtil {
      * Sends an alert to the user using the alert label
      */
     private void sendAnAlert(String message, ColorPicker colors) {
-        alertLabel.setText(message);
+        Platform.runLater(() -> {
+            alertLabel.setText(message);
+        });
         String color = "";
         switch (colors) {
             case GREEN:
@@ -386,7 +403,7 @@ public class MainViewController extends ControllerUtil {
      * Loads customer names into the choice box
      */
     @FXML
-    public void onCustomerNameChoiceBoxClicked(){
+    public void onCustomerNameChoiceBoxClicked() {
         fillOutChoiceBox(appointmentCustomerNameChoiceBox, customerDB.getAllCustomerNames());
     }
 
@@ -425,12 +442,12 @@ public class MainViewController extends ControllerUtil {
      * handles saving appointment data gathering and saving to the database
      */
     @FXML
-    public void onAppointmentSaveButtonClicked(){
+    public void onAppointmentSaveButtonClicked() {
         // checks that all the fields are filled out
-        if(!checkAllAppointmentFieldsFilledOut()){
-           return;
+        if (!checkAllAppointmentFieldsFilledOut()) {
+            return;
         }
-        if(checkIfModifing()){
+        if (checkIfModifing()) {
             int appointmentIndex = getIndexInListView(appointmentListView);
             Appointment appointment = appointmentDB.getAppointmentFromIndex(appointmentIndex);
             int customer_index = getIndexInChoiceBox(appointmentCustomerNameChoiceBox);
@@ -441,7 +458,7 @@ public class MainViewController extends ControllerUtil {
             appointment.contact = appointmentContactTextArea.getText();
             appointment.type = appointmentTypeTextArea.getText();
             appointmentDB.updateAppointment(appointment);
-        }else{
+        } else {
             // Gets all the data from the UI and saves to the database
             Appointment appointment = new Appointment();
             int customer_index = getIndexInChoiceBox(appointmentCustomerNameChoiceBox);

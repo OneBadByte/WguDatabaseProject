@@ -7,11 +7,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.util.Locale;
+
 public class LoginController extends ControllerUtil {
 
     //++++++ com.blackdartq.WguDatabaseProject.FXML Controls ++++++
 
     UserDB userDB = new UserDB();
+    Locale locale = Locale.getDefault();
+
+    public void initialize(){
+       System.out.println(locale.getCountry());
+    }
 
     // Labels
     @FXML

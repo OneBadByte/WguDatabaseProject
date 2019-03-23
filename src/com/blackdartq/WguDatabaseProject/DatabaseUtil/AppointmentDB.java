@@ -13,6 +13,17 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
     }
 
     /**
+     * Check all start times against the current time
+     */
+    public boolean checkAppointmentStartTimes(){
+        boolean output = false;
+//        for(Appointment appointment : appointments){
+//            if(appointment)
+//        }
+        return true;
+    }
+
+    /**
      * Modifies an appointment in the database
      */
     public void updateAppointment(Appointment appointment){
