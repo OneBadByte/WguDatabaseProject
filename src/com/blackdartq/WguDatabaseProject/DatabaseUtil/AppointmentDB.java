@@ -1,9 +1,6 @@
 package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
@@ -87,6 +84,8 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
         final int CONTACT = 7;
         final int TYPE = 8;
         final int URL = 9;
+        final int START = 10;
+        final int END = 11;
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "SELECT * FROM appointment;"
@@ -103,7 +102,9 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
                        resultSet.getString(LOCATION),
                        resultSet.getString(CONTACT),
                        resultSet.getString(TYPE),
-                       resultSet.getString(URL)
+                       resultSet.getString(URL),
+                       resultSet.getTimestamp(START),
+                       resultSet.getTimestamp(END)
                ));
             }
         } catch (SQLException e) {

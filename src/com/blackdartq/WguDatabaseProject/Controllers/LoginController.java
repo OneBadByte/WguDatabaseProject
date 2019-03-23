@@ -17,7 +17,20 @@ public class LoginController extends ControllerUtil {
     Locale locale = Locale.getDefault();
 
     public void initialize(){
-       System.out.println(locale.getCountry());
+       if(isRussianLocale()){
+            setTextToRussian();
+        }
+    }
+
+    private boolean isRussianLocale(){
+        return locale.getCountry().equals("RS");
+    }
+
+    private void setTextToRussian(){
+        headerLabel.setText("Запланируйте это");
+        emailTextField.setPromptText("по электронной почте");
+        passwordTextField.setPromptText("пароль");
+        loginButton.setText("войти в систему");
     }
 
     // Labels
@@ -49,10 +62,15 @@ public class LoginController extends ControllerUtil {
         if(validateLogin()) {
             this.changeSceneTo(this.MAIN_FXML, new MainViewController(), loginButton);
         } else{
-            incorrectUsernamePasswordLabel.setText("Username or Password was incorrect");
+            if(isRussianLocale()){
+                incorrectUsernamePasswordLabel.setText("неверное имя пользователя или пароль");
+            }else{
+                incorrectUsernamePasswordLabel.setText("Username or Password was incorrect");
+            }
             incorrectUsernamePasswordLabel.setStyle("-fx-background-color: #F6BFBE;");
         }
-
+        emailTextField.clear();
+        passwordTextField.clear();
     }
 
     //---------------------------
@@ -66,13 +84,15 @@ public class LoginController extends ControllerUtil {
         String email = this.getTextFieldText(emailTextField);
         String password = this.getTextFieldText(passwordTextField);
         boolean test = userDB.validateUser(email, password);
+        String message = "User: " + email + " Password: " + password +
+                " from: " + locale.getDisplayCountry() + " Language: " + locale.getDisplayLanguage();
         if(test){
-            FileUtil.appendWriteToFile(this.LOG_FILE, "user: " + email + " logged in using: " + password);
+            message = message + " Login: PASS";
         }else{
-            FileUtil.appendWriteToFile(this.LOG_FILE, "user: " + email + " failed to log in using: " + password);
+            message = message + " Login: FAIL";
         }
+        FileUtil.appendWriteToFile(this.LOG_FILE, message);
         return test;
     }
-
     //---------------------------
 }

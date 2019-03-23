@@ -66,7 +66,6 @@ public class DatabaseUtil {
         }
     }
 
-
     public void dropTables(){
         String[] tables = {
                 "appointment",
