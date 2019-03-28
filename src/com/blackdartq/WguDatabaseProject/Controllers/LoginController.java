@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 public class LoginController extends ControllerUtil {
@@ -85,7 +86,8 @@ public class LoginController extends ControllerUtil {
         String password = this.getTextFieldText(passwordTextField);
         boolean test = userDB.validateUser(email, password);
         String message = "User: " + email + " Password: " + password +
-                " from: " + locale.getDisplayCountry() + " Language: " + locale.getDisplayLanguage();
+                " from: " + locale.getDisplayCountry() + " Language: " + locale.getDisplayLanguage()
+                + " Timestamp: " + LocalDateTime.now().toString();
         if(test){
             message = message + " Login: PASS";
         }else{

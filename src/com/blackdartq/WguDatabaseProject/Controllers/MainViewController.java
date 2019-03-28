@@ -7,8 +7,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -32,10 +37,9 @@ public class MainViewController extends ControllerUtil {
      *
      * @return
      */
-    public boolean checkIfModifing() {
+    private boolean checkIfModifying() {
         return currentAction == Action.MODIFY;
     }
-
 
     // Database connections
     private CustomerDB customerDB = new CustomerDB();
@@ -64,22 +68,29 @@ public class MainViewController extends ControllerUtil {
         fillOutChoiceBox(countryChoiceBox, addressDB.getCountries());
         fillOutChoiceBox(appointmentCustomerNameChoiceBox, customerDB.getAllCustomerNames());
 
+        // starts up a thread that will check if any appointments are about to start in 15 minutes
         Runnable r = () -> {
             while (true) {
-                if (appointmentDB.checkAppointmentStartTimes()) {
-                    sendAnAlert("appointment starts soon", ColorPicker.YELLOW);
+                ArrayList<Integer> appointmentsWith15Minutes = appointmentDB.getAllStartTimesWithin15Minutes();
+                if(appointmentsWith15Minutes.size() > 0){
+                   StringBuilder message = new StringBuilder();
+                   message.append("Appointment: ");
+                   for(int index : appointmentsWith15Minutes){
+                       message.append(appointmentDB.getTitleFromIndex(index)).append(" starts in ");
+                       message.append(appointmentDB.getMinutesTillStartFromIndex(index)).append(" minutes");
+                       sendAnAlert(message.toString(), ColorPicker.YELLOW);
+                   }
                 }
                 try {
                     Thread.sleep(10000);
+                    sendAnAlert("", ColorPicker.GREEN);
                 } catch (InterruptedException e) {
                     throw new RuntimeException("couldn't sleep?");
                 }
             }
-//            throw new RuntimeException("Alert thread died");
         };
         Thread thread = new Thread(r);
         thread.start();
-//        customerDB.dropTables();
     }
 
     //++++++ com.blackdartq.WguDatabaseProject.FXML Controls ++++++
@@ -240,54 +251,13 @@ public class MainViewController extends ControllerUtil {
     /**
      * Switches between grids that the user can view
      */
-    public void switchViabilityOfGridPane(GridPanes gridPanes) {
-        switch (gridPanes) {
-            case APPOINTMENT:
-                appointmentPane.setVisible(true);
-                customerPane.setVisible(false);
-                weekGridPane.setVisible(false);
-                monthGridPane.setVisible(false);
-                break;
-            case CUSTOMER:
-                appointmentPane.setVisible(false);
-                customerPane.setVisible(true);
-                weekGridPane.setVisible(false);
-                monthGridPane.setVisible(false);
-                break;
-            case WEEK:
-                appointmentPane.setVisible(false);
-                customerPane.setVisible(false);
-                weekGridPane.setVisible(true);
-                monthGridPane.setVisible(false);
-                break;
-            case MONTH:
-                appointmentPane.setVisible(false);
-                customerPane.setVisible(false);
-                weekGridPane.setVisible(false);
-                monthGridPane.setVisible(true);
-                break;
-        }
-
+    private void switchViabilityOfGridPane(GridPanes gridPanes) {
+        setPaneVisable(gridPanes);
         // checks if the modify action is to be used in Customer pane
-        if (checkIfModifing() && gridPanes == GridPanes.CUSTOMER) {
+        if (checkIfModifying() && gridPanes == GridPanes.CUSTOMER) {
             addressDB.updateAllAddressData();
             int index = getIndexInListView(customerListView);
-            customerNameTextField.setText(customerDB.getCustomerNameByIndex(index));
-
-            // fills out address text fields
-            int addressId = customerDB.getCustomerAddressIdByIndex(index);
-            Address addressData = addressDB.getAddressFromAddressesById(addressId);
-            customerAddressTextField.setText(addressData.address);
-            customerPostalCodeTextField.setText(addressData.postalCode);
-            customerPhoneNumberTextField.setText(addressData.phone);
-
-            // fills out city text fields
-            City cityData = addressDB.getCityFromCitiesByCityId(addressData.cityId);
-            customerCityTextField.setText(cityData.cityName);
-
-            // fills out country fields
-            String countryName = addressDB.getCountryNameFromCountriesById(cityData.countryId);
-            countryChoiceBox.getSelectionModel().select(countryName);
+            setAllCustomerFields(index);
         }
     }
 
@@ -383,7 +353,7 @@ public class MainViewController extends ControllerUtil {
         if (!checkAllCustomerFieldsFilledOut()) {
             return;
         }
-        if (checkIfModifing()) {
+        if (checkIfModifying()) {
             modifyCustomerDataToDatabase();
         } else {
             addCustomerDataToDatabase();
@@ -408,10 +378,11 @@ public class MainViewController extends ControllerUtil {
     }
 
     /**
-     *
+     * Switches to the appointment pane and clears all fields of old data
      */
     @FXML
     public void onAddAppointmentButtonClicked() {
+        resetAppointmentFields();
         currentAction = Action.ADD;
         switchViabilityOfGridPane(GridPanes.APPOINTMENT);
     }
@@ -424,14 +395,10 @@ public class MainViewController extends ControllerUtil {
         currentAction = Action.MODIFY;
         int appointmentIndex = getIndexInListView(appointmentListView);
         Appointment appointment = appointmentDB.getAppointmentFromIndex(appointmentIndex);
-        appointmentTitleTextField.setText(appointment.title);
-        appointmentUrlTextField.setText(appointment.url);
-//        appointmentStartTextField.setText(appointment.url);
-//        appointmentStartTextField.setText(appointment.);
-        appointmentDescriptionTextArea.setText(appointment.description);
-        appointmentLocationTextArea.setText(appointment.location);
-        appointmentContactTextArea.setText(appointment.contact);
-        appointmentTypeTextArea.setText(appointment.type);
+
+        setBasicAppointmentFields(appointment);
+        setAppointmentDateFields(appointmentIndex);
+
         int customerIndex = customerDB.getCustomerIndexById(appointment.customerId);
         appointmentCustomerNameChoiceBox.getSelectionModel().select(customerIndex);
 
@@ -447,29 +414,20 @@ public class MainViewController extends ControllerUtil {
         if (!checkAllAppointmentFieldsFilledOut()) {
             return;
         }
-        if (checkIfModifing()) {
-            int appointmentIndex = getIndexInListView(appointmentListView);
-            Appointment appointment = appointmentDB.getAppointmentFromIndex(appointmentIndex);
-            int customer_index = getIndexInChoiceBox(appointmentCustomerNameChoiceBox);
-            appointment.customerId = customerDB.getCustomerIdByIndex(customer_index);
-            appointment.title = appointmentTitleTextField.getText();
-            appointment.description = appointmentDescriptionTextArea.getText();
-            appointment.location = appointmentLocationTextArea.getText();
-            appointment.contact = appointmentContactTextArea.getText();
-            appointment.type = appointmentTypeTextArea.getText();
+
+        int appointmentIndex = getIndexInListView(appointmentListView);
+        Appointment appointment;
+
+        if(checkIfModifying()){
+            appointment = appointmentDB.getAppointmentFromIndex(appointmentIndex);
+            getAllAppointmentFields(appointment);
             appointmentDB.updateAppointment(appointment);
-        } else {
-            // Gets all the data from the UI and saves to the database
-            Appointment appointment = new Appointment();
-            int customer_index = getIndexInChoiceBox(appointmentCustomerNameChoiceBox);
-            appointment.customerId = customerDB.getCustomerIdByIndex(customer_index);
-            appointment.title = appointmentTitleTextField.getText();
-            appointment.description = appointmentDescriptionTextArea.getText();
-            appointment.location = appointmentLocationTextArea.getText();
-            appointment.contact = appointmentContactTextArea.getText();
-            appointment.type = appointmentTypeTextArea.getText();
+        }else{
+            appointment = new Appointment();
+            getAllAppointmentFields(appointment);
             appointmentDB.addAppointment(appointment);
         }
+
         // fills out appointment list view and switch to the month gridpane
         fillOutListView(appointmentDB.getAppointmentTitles(), appointmentListView);
         switchViabilityOfGridPane(GridPanes.MONTH);
@@ -524,6 +482,7 @@ public class MainViewController extends ControllerUtil {
      */
     public void modifyCustomerDataToDatabase() {
         // Updates the customer portion of the database
+        Customer customer = new Customer();
         String customerName = customerNameTextField.getText();
         int selectedIndex = getIndexInListView(customerListView);
         int customerId = customerDB.getCustomerIdByIndex(selectedIndex);
@@ -576,17 +535,36 @@ public class MainViewController extends ControllerUtil {
         boolean output = true;
         TextField[] textFields = {
                 appointmentTitleTextField,
-//                appointmentUrlTextField,
                 appointmentStartTextField,
                 appointmentEndTextField
         };
 
-//        TextArea[] textAreas = {
-//                appointmentDescriptionTextArea,
-//                appointmentContactTextArea,
-//                appointmentLocationTextArea,
-//                appointmentTypeTextArea
-//        };
+        if(!isTimeTextFieldWithinBusinessHours(appointmentEndTextField)){
+            appointmentEndTextField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
+            return false;
+        }else{
+            appointmentEndTextField.setStyle("-fx-border-color: grey; -fx-background-color: white;");
+        }
+
+        if(!isTimeTextFieldWithinBusinessHours(appointmentStartTextField)){
+            appointmentStartTextField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
+            return false;
+        }else{
+            appointmentStartTextField.setStyle("-fx-border-color: grey; -fx-background-color: white;");
+        }
+
+        // checks if the time fields for start and end are filled out correctly
+        if(!validateTimeFormat(appointmentEndTextField)){
+            appointmentEndTextField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
+            sendAnAlert("Please fill out end time correctly  EX: 12:23 PM", ColorPicker.RED);
+            return false;
+        }
+
+        if(!validateTimeFormat(appointmentStartTextField)){
+            appointmentStartTextField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
+            sendAnAlert("Please fill out start time correctly  EX: 12:23 PM", ColorPicker.RED);
+            return false;
+        }
 
         for (TextField textField : textFields) {
             if (textField.getText().equals("")) {
@@ -639,15 +617,19 @@ public class MainViewController extends ControllerUtil {
      * resets all the fields in the customer info pane
      */
     private void resetAppointmentFields() {
+        appointmentCustomerNameChoiceBox.getSelectionModel().clearSelection();
         appointmentTitleTextField.clear();
         appointmentUrlTextField.clear();
-        appointmentStartTextField.clear();
-        appointmentEndTextField.clear();
 
         appointmentDescriptionTextArea.clear();
         appointmentLocationTextArea.clear();
         appointmentContactTextArea.clear();
         appointmentTypeTextArea.clear();
+
+        appointmentStartTextField.clear();
+        appointmentEndTextField.clear();
+        appointmentStartDatePicker.getEditor().clear();
+        appointmentEndDatePicker.getEditor().clear();
     }
 
     /**
@@ -754,6 +736,137 @@ public class MainViewController extends ControllerUtil {
         this.labelArrayList.add(label);
     }
 
+    public boolean validateTimeFormat(TextField textField){
+        String[] time = textField.getText().split(" ");
+        if(time.length != 2){
+            return false;
+        }
+        String[] hourMin = time[0].split(":");
+        if(hourMin.length != 2){
+            return false;
+        }
+        String amPm = time[1].toUpperCase();
+        switch(amPm){
+            case "AM":
+            case "PM":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isTimeTextFieldWithinBusinessHours(TextField textField){
+        String[] time = textField.getText().split(" ");
+        String[] hourMin = time[0].split(":");
+        String amPm = time[1].toUpperCase();
+        int hours = Integer.valueOf(hourMin[0]);
+        if(hours >= 5 && amPm.equals("PM") || hours < 9 && amPm.equals("AM")){
+            sendAnAlert("Please enter a time within business hours (9AM - 5PM)", ColorPicker.RED);
+            return false;
+        }
+        return true;
+    }
+
+    private LocalDateTime getLocalDateTimeFromAppointmentFields(TextField textField, DatePicker datePicker){
+        String[] time = textField.getText().split(" ");
+        String[] hourMin = time[0].split(":");
+        String amPm = time[1].toUpperCase();
+        int hours = Integer.valueOf(hourMin[0]);
+        int min = Integer.valueOf(hourMin[1]);
+        if(amPm.equals("PM") && hours != 12){
+            hours += 12;
+        }else if(amPm.equals("AM") && hours == 12){
+            hours = 0;
+        }
+        LocalTime localTime = LocalTime.of(hours, min);
+        LocalDate localDate = datePicker.getValue();
+        return LocalDateTime.of(localDate, localTime);
+    }
+
+    private void setAllCustomerFields(int customerIndex){
+        customerNameTextField.setText(customerDB.getCustomerNameByIndex(customerIndex));
+
+        // fills out address text fields
+        int addressId = customerDB.getCustomerAddressIdByIndex(customerIndex);
+        Address addressData = addressDB.getAddressFromAddressesById(addressId);
+        customerAddressTextField.setText(addressData.address);
+        customerPostalCodeTextField.setText(addressData.postalCode);
+        customerPhoneNumberTextField.setText(addressData.phone);
+        // fills out city text fields
+        City cityData = addressDB.getCityFromCitiesByCityId(addressData.cityId);
+        customerCityTextField.setText(cityData.cityName);
+
+        // fills out country fields
+        String countryName = addressDB.getCountryNameFromCountriesById(cityData.countryId);
+        countryChoiceBox.getSelectionModel().select(countryName);
+    }
+
+    /**
+     * Get all appointment fields
+     */
+    private void getAllAppointmentFields(Appointment appointment){
+        int customer_index = getIndexInChoiceBox(appointmentCustomerNameChoiceBox);
+        appointment.customerId = customerDB.getCustomerIdByIndex(customer_index);
+        appointment.title = appointmentTitleTextField.getText();
+        appointment.description = appointmentDescriptionTextArea.getText();
+        appointment.location = appointmentLocationTextArea.getText();
+        appointment.contact = appointmentContactTextArea.getText();
+        appointment.type = appointmentTypeTextArea.getText();
+        appointment.start = Timestamp
+                .valueOf(getLocalDateTimeFromAppointmentFields(appointmentStartTextField, appointmentStartDatePicker));
+        appointment.end = Timestamp
+                .valueOf(getLocalDateTimeFromAppointmentFields(appointmentEndTextField, appointmentEndDatePicker));
+    }
+
+    private void setBasicAppointmentFields(Appointment appointment){
+        // gets values of the normal text fields/areas
+        appointmentTitleTextField.setText(appointment.title);
+        appointmentUrlTextField.setText(appointment.url);
+        appointmentDescriptionTextArea.setText(appointment.description);
+        appointmentLocationTextArea.setText(appointment.location);
+        appointmentContactTextArea.setText(appointment.contact);
+        appointmentTypeTextArea.setText(appointment.type);
+    }
+
+    private void setAppointmentDateFields(int appointmentIndex) {
+        // sets the time and date for the start and end sections
+        appointmentStartTextField.setText(appointmentDB.getStartTimeFromIndex(appointmentIndex));
+        appointmentEndTextField.setText(appointmentDB.getEndTimeFromIndex(appointmentIndex));
+        appointmentStartDatePicker.valueProperty()
+                .set(appointmentDB.getStartLocalDateTimeByIndex(appointmentIndex).toLocalDate());
+        appointmentEndDatePicker.valueProperty()
+                .set(appointmentDB.getEndLocalDateTimeByIndex(appointmentIndex).toLocalDate());
+    }
+
+    private void setPaneVisable(GridPanes gridPane){
+        switch (gridPane) {
+            case APPOINTMENT:
+                appointmentPane.setVisible(true);
+                customerPane.setVisible(false);
+                weekGridPane.setVisible(false);
+                monthGridPane.setVisible(false);
+                break;
+            case CUSTOMER:
+                appointmentPane.setVisible(false);
+                customerPane.setVisible(true);
+                weekGridPane.setVisible(false);
+                monthGridPane.setVisible(false);
+                break;
+            case WEEK:
+                appointmentPane.setVisible(false);
+                customerPane.setVisible(false);
+                weekGridPane.setVisible(true);
+                monthGridPane.setVisible(false);
+                break;
+            case MONTH:
+                appointmentPane.setVisible(false);
+                customerPane.setVisible(false);
+                weekGridPane.setVisible(false);
+                monthGridPane.setVisible(true);
+                break;
+        }
+
+    }
     //---------------------------
 }
 

@@ -6,18 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-class Customer{
-    int customerId;
-    String customerName;
-    int addressId;
-
-    Customer(int Id, String customerName, int addressId){
-        this.customerId = Id;
-        this.customerName = customerName;
-        this.addressId = addressId;
-    }
-}
-
 public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
     private ArrayList<Customer> customers = new ArrayList<>();
 

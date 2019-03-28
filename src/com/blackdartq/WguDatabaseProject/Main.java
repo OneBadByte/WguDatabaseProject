@@ -15,8 +15,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage){
         ControllerUtil controllerUtil = new ControllerUtil();
-        controllerUtil.changeSceneTo(controllerUtil.LOGIN_FXML, new LoginController(), primaryStage);
-//        controllerUtil.changeSceneTo(controllerUtil.MAIN_FXML, new MainViewController(), primaryStage);
+//        controllerUtil.changeSceneTo(controllerUtil.LOGIN_FXML, new LoginController(), primaryStage);
+        controllerUtil.changeSceneTo(controllerUtil.MAIN_FXML, new MainViewController(), primaryStage);
 //        Platform.exit();
     }
 

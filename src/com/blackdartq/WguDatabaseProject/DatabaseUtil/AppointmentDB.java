@@ -1,6 +1,8 @@
 package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
@@ -8,6 +10,7 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
     public AppointmentDB(){
         getAppointmentsFromDatabase();
     }
+
 
     /**
      * Check all start times against the current time
@@ -29,7 +32,7 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
             statement = connection.prepareStatement(
                     "UPDATE appointment " +
                             "SET customerId = ?, title = ?, description = ?, location = ?, contact = ?, " +
-                            "type = ?, url = ? " +
+                            "type = ?, url = ?, start = ?, end = ? " +
                             "WHERE appointmentId = ?;"
             );
             statement.setInt(1, appointment.customerId);
@@ -39,7 +42,9 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
             statement.setString(5, appointment.contact);
             statement.setString(6, appointment.type);
             statement.setString(7, appointment.url);
-            statement.setInt(8, appointment.appointmentId);
+            statement.setTimestamp(8, appointment.start);
+            statement.setTimestamp(9, appointment.end);
+            statement.setInt(10, appointment.appointmentId);
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -54,7 +59,7 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "INSERT INTO appointment VALUE(NULL, ?, 1, ?, ?, ?, ?, ?, ?, " +
-                            "CURDATE(), CURDATE(), " +
+                            "?, ?, " +
                             "CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');"
             );
             statement.setInt(1, appointment.customerId);
@@ -64,6 +69,8 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
             statement.setString(5, appointment.contact);
             statement.setString(6, appointment.type);
             statement.setString(7, appointment.url);
+            statement.setTimestamp(8, appointment.start);
+            statement.setTimestamp(9, appointment.end);
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException("Couldn't add appointment to the database");
@@ -134,6 +141,102 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
             output.add(appointment.title);
         }
         return output;
+    }
+
+    /**
+     * gets all the start timestamps
+     */
+    public ArrayList getAllStartTimestamps(){
+        ArrayList<LocalDateTime> output = new ArrayList<>();
+        for(Appointment appointment : appointments){
+           output.add(appointment.start.toLocalDateTime());
+        }
+        return output;
+    }
+
+    /**
+     * Checks the localDateTime passed to method is within 15 minutes
+     */
+    public boolean checkLocalDateTimeWithin15Minutes(LocalDateTime localDateTime){
+        LocalDateTime now = LocalDateTime.now();
+        if(now.getYear() != localDateTime.getYear()){
+           return false;
+        }
+        if(now.getMonthValue() != localDateTime.getMonthValue()){
+            return false;
+        }
+        if(now.getDayOfMonth() != localDateTime.getDayOfMonth()){
+            return false;
+        }
+        if(now.getHour() != localDateTime.getHour()){
+            return false;
+        }
+        int timeDelta = localDateTime.getMinute() - now.getMinute();
+        if( timeDelta > 15 || timeDelta < 0 ){
+            return false;
+        }
+        return true;
+    }
+
+    public int getMinutesTillStartFromIndex(int index){
+        LocalDateTime now = LocalDateTime.now();
+        return appointments.get(index).start.toLocalDateTime().getMinute() - now.getMinute();
+    }
+
+    public ArrayList getAllStartTimesWithin15Minutes(){
+        ArrayList<Integer> appointmentIndexOutput = new ArrayList<Integer>();
+        int count = 0;
+        for(Appointment appointment : appointments){
+            if(checkLocalDateTimeWithin15Minutes(appointment.start.toLocalDateTime())){
+                appointmentIndexOutput.add(count);
+            }
+            count++;
+        }
+        return appointmentIndexOutput;
+    }
+
+    /**
+     * gets a LocalDateTime from the given appointment index
+     */
+
+    public LocalDateTime getStartLocalDateTimeByIndex(int index){
+        Appointment appointment = getAppointmentFromIndex(index);
+        return appointment.start.toLocalDateTime();
+    }
+
+    public LocalDateTime getEndLocalDateTimeByIndex(int index){
+        Appointment appointment = getAppointmentFromIndex(index);
+        return appointment.end.toLocalDateTime();
+    }
+
+    public String getTimeFromLocalDateTime(LocalDateTime localDateTime){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
+        return localDateTime.format(formatter);
+    }
+
+    private String getDateFromLocalDateTime(LocalDateTime localDateTime){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/u");
+        return localDateTime.format(formatter);
+    }
+
+    public String getStartTimeFromIndex(int index){
+        return getTimeFromLocalDateTime(getStartLocalDateTimeByIndex(index));
+    }
+
+    public String getStartTimeDateFromIndex(int index){
+        return getDateFromLocalDateTime(getStartLocalDateTimeByIndex(index));
+    }
+
+    public String getEndTimeFromIndex(int index){
+        return getTimeFromLocalDateTime(getEndLocalDateTimeByIndex(index));
+    }
+
+    public String getTitleFromIndex(int index){
+        return getAppointmentFromIndex(index).title;
+    }
+
+    public String getEndTimeDateFromIndex(int index){
+        return getDateFromLocalDateTime(getEndLocalDateTimeByIndex(index));
     }
 
     /**

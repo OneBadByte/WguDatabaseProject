@@ -24,7 +24,6 @@ public class FileUtil {
 
    public static void appendWriteToFile(String fileName, String text){
        String oldData = readFromFile(fileName);
-       System.out.println(oldData);
        oldData = oldData + text;
        try {
            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));

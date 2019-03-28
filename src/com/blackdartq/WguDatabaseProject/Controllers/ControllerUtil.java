@@ -7,8 +7,10 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 
 enum ColorPicker{
     RED,
@@ -31,14 +33,14 @@ class FxUtil{
     //+++++++++ Stage functions ++++++++++
 
     /**
-     *
+     * gets the current stage from a control
      */
-    public Stage getStage(Control control){
+    public Stage getStageFromControl(Control control){
         return (Stage)  control.getScene().getWindow();
     }
 
     /**
-     *
+     * Changes the javaFX scene by using an FXML file
      */
     public void changeSceneTo(String fxmlFIle, Object controller, Stage stage){
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFIle));
@@ -62,7 +64,7 @@ class FxUtil{
         loader.setController(controller);
         try {
             Parent parent = loader.load();
-            Stage stage = this.getStage(control);
+            Stage stage = this.getStageFromControl(control);
             stage.setScene(new Scene(parent));
             stage.show();
         } catch (IOException e) {
@@ -138,4 +140,5 @@ public class ControllerUtil<T> extends FxUtil{
         int test = listView.getSelectionModel().getSelectedIndex();
         return test;
     }
+
 }

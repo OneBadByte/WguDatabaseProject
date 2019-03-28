@@ -5,3 +5,5 @@ User: ds Password:  from: Serbia Timezone: English Login: FAIL
 User: test Password: test from: Serbia Timezone: English Login: PASS
 User: dsfdfs Password:  from: Serbia Language: English Login: FAIL
 User: test Password: test from: Serbia Language: English Login: PASS
+User: test Password: test from: Serbia Language: English Login: PASS
+User: test Password: test from: Serbia Language: English Login: PASS
