@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -120,7 +119,7 @@
                            <HBox.margin>
                               <Insets right="30.0" />
                            </HBox.margin></Button>
-                        <ComboBox fx:id="timeZoneDropDown" prefHeight="40.0" prefWidth="150.0" promptText="Time Zone" style="-fx-background-color: white;" />
+                        <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="89.0" style="-fx-background-color: white;" text="Reports" />
                      </children>
                      <opaqueInsets>
                         <Insets />
@@ -268,8 +267,8 @@
                               <Label text="Type" GridPane.rowIndex="5" />
                               <Label text="Description" GridPane.rowIndex="2" />
                               <Label text="Url" GridPane.rowIndex="6" />
-                              <Label text="Start" GridPane.rowIndex="7" />
-                              <Label text="End" GridPane.rowIndex="8" />
+                              <Label text="Start and End" GridPane.rowIndex="7" />
+                              <Label text="Date" GridPane.rowIndex="8" />
                               <TextField fx:id="appointmentUrlTextField" alignment="CENTER" prefHeight="26.0" prefWidth="294.0" promptText="https://youtube.com" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                               <ChoiceBox fx:id="appointmentCustomerNameChoiceBox" onMouseClicked="#onCustomerNameChoiceBoxClicked" prefHeight="26.0" prefWidth="291.0" style="-fx-background-color: white; -fx-border-color: lightgrey;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
                               <TextArea fx:id="appointmentDescriptionTextArea" prefHeight="200.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
@@ -279,13 +278,12 @@
                               <HBox alignment="CENTER" prefHeight="36.0" prefWidth="291.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
                                  <children>
                                     <TextField fx:id="appointmentStartTextField" alignment="CENTER" promptText="11:59 AM" />
-                                    <DatePicker fx:id="appointmentStartDatePicker" />
+                                    <TextField fx:id="appointmentEndTextField" alignment="CENTER" promptText="12:00 PM" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER" prefHeight="35.0" prefWidth="292.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
                                  <children>
-                                    <TextField fx:id="appointmentEndTextField" alignment="CENTER" promptText="12:00 PM" />
-                                    <DatePicker fx:id="appointmentEndDatePicker" />
+                                    <DatePicker fx:id="appointmentDatePicker" />
                                  </children>
                               </HBox>
                            </children>

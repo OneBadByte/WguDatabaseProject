@@ -141,4 +141,18 @@ public class ControllerUtil<T> extends FxUtil{
         return test;
     }
 
+    /**
+     * turns a control(text field, button, etc) red with a grey border
+     */
+    public static void turnControlRed(Control control){
+        control.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
+    }
+
+    /**
+     * turns a control(text field, button, etc) white with a grey border
+     */
+    public static void turnControlWhite(Control control){
+        control.setStyle("-fx-border-color: grey; -fx-background-color: white");
+    }
+
 }

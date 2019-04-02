@@ -1,5 +1,6 @@
 package com.blackdartq.WguDatabaseProject.Controllers;
 
+import com.blackdartq.WguDatabaseProject.CommonUtil.CommonUtil;
 import com.blackdartq.WguDatabaseProject.DatabaseUtil.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -7,7 +8,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -29,7 +29,7 @@ public class MainViewController extends ControllerUtil {
         MODIFY
     }
 
-    Action currentAction = Action.ADD;
+    private Action currentAction = Action.ADD;
 
     /**
      * Checks if the action being executed is adding or modifying data
@@ -78,12 +78,12 @@ public class MainViewController extends ControllerUtil {
                    for(int index : appointmentsWith15Minutes){
                        message.append(appointmentDB.getTitleFromIndex(index)).append(" starts in ");
                        message.append(appointmentDB.getMinutesTillStartFromIndex(index)).append(" minutes");
-                       sendAnAlert(message.toString(), ColorPicker.YELLOW);
+                       sendWarning(message.toString());
                    }
                 }
                 try {
                     Thread.sleep(10000);
-                    sendAnAlert("", ColorPicker.GREEN);
+                    clearAlert();
                 } catch (InterruptedException e) {
                     throw new RuntimeException("couldn't sleep?");
                 }
@@ -103,9 +103,7 @@ public class MainViewController extends ControllerUtil {
 
     // Date Picker
     @FXML
-    DatePicker appointmentStartDatePicker;
-    @FXML
-    DatePicker appointmentEndDatePicker;
+    DatePicker appointmentDatePicker;
 
     // split choice box
     @FXML
@@ -252,7 +250,7 @@ public class MainViewController extends ControllerUtil {
      * Switches between grids that the user can view
      */
     private void switchViabilityOfGridPane(GridPanes gridPanes) {
-        setPaneVisable(gridPanes);
+        setPaneVisible(gridPanes);
         // checks if the modify action is to be used in Customer pane
         if (checkIfModifying() && gridPanes == GridPanes.CUSTOMER) {
             addressDB.updateAllAddressData();
@@ -288,6 +286,26 @@ public class MainViewController extends ControllerUtil {
     }
 
     //+++++++++++++++++ Customer controls ++++++++++++++++++++++++
+    /**
+     * clears the alert bar
+     */
+    private void clearAlert(){
+        sendAnAlert("", ColorPicker.GREEN);
+    }
+
+    /**
+     * sends a warning message to the user
+     */
+    private void sendWarning(String message){
+        sendAnAlert(message, ColorPicker.YELLOW);
+    }
+
+    /**
+     * sends an error message to the user
+     */
+    private void sendError(String message){
+        sendAnAlert(message, ColorPicker.RED);
+    }
 
     /**
      * Sends an alert to the user using the alert label
@@ -363,7 +381,7 @@ public class MainViewController extends ControllerUtil {
         fillOutListView(customerDB.getAllCustomerNames(), customerListView);
         resetCustomerFields();
         switchViabilityOfGridPane(GridPanes.MONTH);
-        sendAnAlert("", ColorPicker.GREEN);
+        clearAlert();
     }
 
 
@@ -393,6 +411,7 @@ public class MainViewController extends ControllerUtil {
     @FXML
     public void onModifyAppointmentButtonClicked() {
         currentAction = Action.MODIFY;
+        resetAppointmentFields();
         int appointmentIndex = getIndexInListView(appointmentListView);
         Appointment appointment = appointmentDB.getAppointmentFromIndex(appointmentIndex);
 
@@ -411,7 +430,13 @@ public class MainViewController extends ControllerUtil {
     @FXML
     public void onAppointmentSaveButtonClicked() {
         // checks that all the fields are filled out
-        if (!checkAllAppointmentFieldsFilledOut()) {
+        if (!checkAppointmentFieldsFilledOut()) {
+            System.out.println("hit1");
+            return;
+        }
+
+        if (!checkAppointmentTimes()) {
+            System.out.println("hit2");
             return;
         }
 
@@ -431,7 +456,7 @@ public class MainViewController extends ControllerUtil {
         // fills out appointment list view and switch to the month gridpane
         fillOutListView(appointmentDB.getAppointmentTitles(), appointmentListView);
         switchViabilityOfGridPane(GridPanes.MONTH);
-        sendAnAlert("", ColorPicker.GREEN);
+        clearAlert();
     }
 
     /**
@@ -470,7 +495,6 @@ public class MainViewController extends ControllerUtil {
     @FXML
     public void deleteDatabase() {
         customerDB.dropTables();
-        sendAnAlert("deleting database!!!", ColorPicker.RED);
         Platform.exit();
     }
     //---------------------------
@@ -510,7 +534,7 @@ public class MainViewController extends ControllerUtil {
     /**
      * Saves all the customer info to the database
      */
-    public void addCustomerDataToDatabase() {
+    private void addCustomerDataToDatabase() {
         // gets data from text fields
         String customerName = customerNameTextField.getText();
         String phoneNumber = customerPhoneNumberTextField.getText();
@@ -525,56 +549,99 @@ public class MainViewController extends ControllerUtil {
         addressDB.addAddressToDatabase(address, address, cityId, postalCode, phoneNumber);
         int addressId = addressDB.getAddressId(address, cityId, postalCode, phoneNumber);
         customerDB.addCustomer(customerName, addressId);
-        sendAnAlert(customerName + " was added to the database", ColorPicker.YELLOW);
+        sendWarning(customerName + " was added to the database");
+    }
+
+    /**
+     * tests that the appointment fields are correctly filled out and the date picker is not null
+     */
+    private boolean checkAppointmentTimes(){
+        LocalDateTime start = getLocalDateTimeFromAppointmentFields(appointmentStartTextField, appointmentDatePicker);
+        LocalDateTime end = getLocalDateTimeFromAppointmentFields(appointmentEndTextField, appointmentDatePicker);
+        int appointmentId;
+
+        Boolean output = true;
+        Boolean test1 = appointmentDatePicker.valueProperty().isNotNull().get();
+        Boolean test2 = isTimeTextFieldWithinBusinessHours(appointmentStartTextField);
+        Boolean test3 = isTimeTextFieldWithinBusinessHours(appointmentEndTextField);
+        Boolean test4 = !CommonUtil.localDateTimeAfter(start, end);
+        Boolean test5 = true;
+        if(checkIfModifying()){
+            appointmentId = appointmentDB.getAppointmentIdFromIndex(getIndexInListView(appointmentListView));
+            test5 = !appointmentDB.isAlreadyScheduled(start, end, appointmentId);
+        }else{
+            test5 = !appointmentDB.isAlreadyScheduled(start, end);
+        }
+        Boolean test6 = validateTimeFormat(appointmentStartTextField);
+        Boolean test7 = validateTimeFormat(appointmentEndTextField);
+
+        output = validateControl(test1, appointmentDatePicker, "Please add start and end dates");
+        if(!output){
+            return false;
+        }
+        output = validateControl(test2, appointmentStartTextField, "please enter a time within business hours");
+        if(!output){
+            return false;
+        }
+        output = validateControl(test3, appointmentEndTextField, "please enter a time within business hours");
+        if(!output){
+            return false;
+        }
+        output = validateControl(test4, appointmentStartTextField, appointmentEndTextField,
+                "Please enter a start time before the end time");
+        if(!output){
+            return false;
+        }
+        output = validateControl(test5, appointmentStartTextField, appointmentEndTextField,
+        "Time section already scheduled for!");
+        if(!output){
+            return false;
+        }
+
+        // checks if the time fields for start and end are filled out correctly
+        output = validateControl(test6, appointmentStartTextField, "Please fill out end time correctly  EX: 12:23 PM");
+        if(!output){
+            return false;
+        }
+        output = validateControl(test7, appointmentStartTextField, "Please fill out end time correctly  EX: 12:23 PM");
+        return output;
     }
 
     /**
      * Checks that all the fields are filled out in the customer pane
      */
-    private boolean checkAllAppointmentFieldsFilledOut() {
+    private boolean checkAppointmentFieldsFilledOut() {
         boolean output = true;
         TextField[] textFields = {
                 appointmentTitleTextField,
+                appointmentUrlTextField,
                 appointmentStartTextField,
                 appointmentEndTextField
         };
 
-        if(!isTimeTextFieldWithinBusinessHours(appointmentEndTextField)){
-            appointmentEndTextField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
-            return false;
-        }else{
-            appointmentEndTextField.setStyle("-fx-border-color: grey; -fx-background-color: white;");
-        }
-
-        if(!isTimeTextFieldWithinBusinessHours(appointmentStartTextField)){
-            appointmentStartTextField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
-            return false;
-        }else{
-            appointmentStartTextField.setStyle("-fx-border-color: grey; -fx-background-color: white;");
-        }
-
-        // checks if the time fields for start and end are filled out correctly
-        if(!validateTimeFormat(appointmentEndTextField)){
-            appointmentEndTextField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
-            sendAnAlert("Please fill out end time correctly  EX: 12:23 PM", ColorPicker.RED);
-            return false;
-        }
-
-        if(!validateTimeFormat(appointmentStartTextField)){
-            appointmentStartTextField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
-            sendAnAlert("Please fill out start time correctly  EX: 12:23 PM", ColorPicker.RED);
-            return false;
-        }
+        TextArea[] textAreas = {
+                appointmentDescriptionTextArea,
+                appointmentLocationTextArea,
+                appointmentContactTextArea,
+                appointmentTypeTextArea
+        };
 
         for (TextField textField : textFields) {
-            if (textField.getText().equals("")) {
-                textField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
-                sendAnAlert("Please fill in all fields", ColorPicker.RED);
+            boolean test = validateControl(!textField.getText().equals(""),
+                    textField, "Please fill out all fields");
+            if(!test){
                 output = false;
-            } else {
-                textField.setStyle("-fx-border-color: grey; -fx-background-color: white;");
             }
         }
+
+        for (TextArea textArea: textAreas) {
+            boolean test = validateControl(!textArea.getText().equals(""),
+                    textArea, "Please fill out all fields");
+            if(!test){
+                output = false;
+            }
+        }
+        System.out.println("hit 1: " + output);
         return output;
     }
 
@@ -628,8 +695,7 @@ public class MainViewController extends ControllerUtil {
 
         appointmentStartTextField.clear();
         appointmentEndTextField.clear();
-        appointmentStartDatePicker.getEditor().clear();
-        appointmentEndDatePicker.getEditor().clear();
+        appointmentDatePicker.getEditor().clear();
     }
 
     /**
@@ -683,7 +749,6 @@ public class MainViewController extends ControllerUtil {
      */
     private String getCompleteCurrentDate() {
         Calendar calendar = createCalendar();
-//        System.out.println(new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime()));
         return new SimpleDateFormat("MM/YYYY").format(calendar.getTime());
     }
 
@@ -758,8 +823,15 @@ public class MainViewController extends ControllerUtil {
     private boolean isTimeTextFieldWithinBusinessHours(TextField textField){
         String[] time = textField.getText().split(" ");
         String[] hourMin = time[0].split(":");
+        if(time.length != 2 || hourMin.length != 2){
+            sendAnAlert("Please add AM/PM to the time boxes", ColorPicker.RED);
+            return false;
+        }
         String amPm = time[1].toUpperCase();
         int hours = Integer.valueOf(hourMin[0]);
+        if(hours == 12 && amPm.equals("PM")){
+            return true;
+        }
         if(hours >= 5 && amPm.equals("PM") || hours < 9 && amPm.equals("AM")){
             sendAnAlert("Please enter a time within business hours (9AM - 5PM)", ColorPicker.RED);
             return false;
@@ -812,33 +884,33 @@ public class MainViewController extends ControllerUtil {
         appointment.location = appointmentLocationTextArea.getText();
         appointment.contact = appointmentContactTextArea.getText();
         appointment.type = appointmentTypeTextArea.getText();
-        appointment.start = Timestamp
-                .valueOf(getLocalDateTimeFromAppointmentFields(appointmentStartTextField, appointmentStartDatePicker));
-        appointment.end = Timestamp
-                .valueOf(getLocalDateTimeFromAppointmentFields(appointmentEndTextField, appointmentEndDatePicker));
+        appointment.url = appointmentUrlTextField.getText();
+
+        LocalDateTime start = getLocalDateTimeFromAppointmentFields(appointmentStartTextField, appointmentDatePicker);
+        LocalDateTime end = getLocalDateTimeFromAppointmentFields(appointmentEndTextField, appointmentDatePicker);
+        appointment.start = Timestamp.valueOf(start);
+        appointment.end = Timestamp.valueOf(end);
     }
 
     private void setBasicAppointmentFields(Appointment appointment){
         // gets values of the normal text fields/areas
         appointmentTitleTextField.setText(appointment.title);
-        appointmentUrlTextField.setText(appointment.url);
         appointmentDescriptionTextArea.setText(appointment.description);
         appointmentLocationTextArea.setText(appointment.location);
         appointmentContactTextArea.setText(appointment.contact);
         appointmentTypeTextArea.setText(appointment.type);
+        appointmentUrlTextField.setText(appointment.url);
     }
 
     private void setAppointmentDateFields(int appointmentIndex) {
         // sets the time and date for the start and end sections
+        LocalDate date = appointmentDB.getStartLocalDateTimeByIndex(appointmentIndex).toLocalDate();
+        appointmentDatePicker.valueProperty().set(date);
         appointmentStartTextField.setText(appointmentDB.getStartTimeFromIndex(appointmentIndex));
         appointmentEndTextField.setText(appointmentDB.getEndTimeFromIndex(appointmentIndex));
-        appointmentStartDatePicker.valueProperty()
-                .set(appointmentDB.getStartLocalDateTimeByIndex(appointmentIndex).toLocalDate());
-        appointmentEndDatePicker.valueProperty()
-                .set(appointmentDB.getEndLocalDateTimeByIndex(appointmentIndex).toLocalDate());
     }
 
-    private void setPaneVisable(GridPanes gridPane){
+    private void setPaneVisible(GridPanes gridPane){
         switch (gridPane) {
             case APPOINTMENT:
                 appointmentPane.setVisible(true);
@@ -866,6 +938,39 @@ public class MainViewController extends ControllerUtil {
                 break;
         }
 
+    }
+
+    public boolean validateControl(Boolean test, Control control){
+        if(!test){
+            turnControlRed(control);
+            return false;
+        }
+        turnControlWhite(control);
+        return true;
+    }
+
+    public boolean validateControl(Boolean test, Control control, String message){
+        if(!test){
+            turnControlRed(control);
+            sendError(message);
+            return false;
+        }
+        turnControlWhite(control);
+        clearAlert();
+        return true;
+    }
+
+    public boolean validateControl(Boolean test, Control control, Control control2, String message){
+        if(!test){
+            turnControlRed(control);
+            turnControlRed(control2);
+            sendError(message);
+            return false;
+        }
+        turnControlWhite(control);
+        turnControlWhite(control2);
+        clearAlert();
+        return true;
     }
     //---------------------------
 }

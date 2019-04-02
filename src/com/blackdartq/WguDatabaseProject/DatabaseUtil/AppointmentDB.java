@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import static com.blackdartq.WguDatabaseProject.CommonUtil.CommonUtil.localDateTimeAfter;
+import static com.blackdartq.WguDatabaseProject.CommonUtil.CommonUtil.localDateTimeBefore;
+
 public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
     private ArrayList<Appointment> appointments = new ArrayList<>();
     public AppointmentDB(){
@@ -117,6 +120,60 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
         } catch (SQLException e) {
             throw new RuntimeException("couldn't get appointments from the database");
         }
+    }
+    /**
+     * Checks if LocalDateTimes are already scheduled for
+     */
+    public boolean isAlreadyScheduled(LocalDateTime start, LocalDateTime end){
+        for(Appointment appointment : appointments){
+            LocalDateTime appointmentStart = appointment.start.toLocalDateTime();
+            LocalDateTime appointmentEnd = appointment.end.toLocalDateTime();
+
+            boolean test1 = localDateTimeAfter(start, appointmentStart);
+            boolean test2 = !localDateTimeAfter(start, appointmentEnd);
+            boolean test3 = localDateTimeAfter(end, appointmentStart);
+            boolean test4 = !localDateTimeAfter(end, appointmentEnd);
+
+            boolean test5 = !localDateTimeAfter(start, appointmentStart);
+            boolean test8 = localDateTimeAfter(end, appointmentEnd);
+
+            if(test1 && test2 || test3 && test4){
+                return true;
+            }
+            if(test5  && test8){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if LocalDateTimes are already scheduled for
+     */
+    public boolean isAlreadyScheduled(LocalDateTime start, LocalDateTime end, int appointmentId){
+        for(Appointment appointment : appointments){
+            if(appointmentId == appointment.appointmentId){
+                break;
+            }
+            LocalDateTime appointmentStart = appointment.start.toLocalDateTime();
+            LocalDateTime appointmentEnd = appointment.end.toLocalDateTime();
+
+            boolean test1 = localDateTimeAfter(start, appointmentStart);
+            boolean test2 = !localDateTimeAfter(start, appointmentEnd);
+            boolean test3 = localDateTimeAfter(end, appointmentStart);
+            boolean test4 = !localDateTimeAfter(end, appointmentEnd);
+
+            boolean test5 = !localDateTimeAfter(start, appointmentStart);
+            boolean test8 = localDateTimeAfter(end, appointmentEnd);
+
+            if(test1 && test2 || test3 && test4){
+                return true;
+            }
+            if(test5  && test8){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
