@@ -12,13 +12,10 @@ public class CommonUtil {
                 localDateTime1.getMinute() - localDateTime2.getMinute(),
         };
         for (int t: dateTime){
-            System.out.print(t + " ");
             if(t < 0){
-                System.out.println(" ");
                 return false;
             }
         }
-        System.out.println(" ");
         return true;
     }
 
@@ -31,13 +28,10 @@ public class CommonUtil {
                 localDateTime1.getMinute() - localDateTime2.getMinute(),
         };
         for (int t: dateTime){
-            System.out.print(t + " ");
             if(t > 0){
-                System.out.println(" ");
                 return false;
             }
         }
-        System.out.println(" ");
         return true;
     }
 }

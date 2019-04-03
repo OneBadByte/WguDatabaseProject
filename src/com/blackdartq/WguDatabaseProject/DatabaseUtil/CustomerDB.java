@@ -13,7 +13,7 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
         return customers.size();
     }
 
-    public ArrayList getAllCustomerIDs(){
+    public ArrayList<Integer> getAllCustomerIDs(){
         getAllCustomersFromDatabase();
        ArrayList<Integer> output = new ArrayList<>();
        for(Customer customer : customers){
@@ -29,6 +29,19 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
             output.add(customer.customerName);
         }
         return output;
+    }
+
+    public Customer getCustomerById(int id){
+       for(Customer customer: customers){
+           if(customer.customerId == id){
+               return customer;
+           }
+       }
+       throw new RuntimeException("couldn't get customer by ID");
+    }
+
+    public String getCustomerNameById(int id){
+        return getCustomerById(id).customerName;
     }
 
     public int getCustomerIndexById(int id){

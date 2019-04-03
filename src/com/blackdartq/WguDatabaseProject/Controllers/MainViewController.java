@@ -155,6 +155,9 @@ public class MainViewController extends ControllerUtil {
     @FXML
     Button appointmentCancelButton;
 
+    @FXML
+    Button reportButton;
+
     // Panes
     @FXML
     public GridPane monthGridPane = new GridPane();
@@ -431,12 +434,10 @@ public class MainViewController extends ControllerUtil {
     public void onAppointmentSaveButtonClicked() {
         // checks that all the fields are filled out
         if (!checkAppointmentFieldsFilledOut()) {
-            System.out.println("hit1");
             return;
         }
 
         if (!checkAppointmentTimes()) {
-            System.out.println("hit2");
             return;
         }
 
@@ -468,6 +469,12 @@ public class MainViewController extends ControllerUtil {
         appointmentDB.deleteByIndex(index);
         appointmentDB.getAppointmentsFromDatabase();
         fillOutListView(appointmentDB.getAppointmentTitles(), appointmentListView);
+    }
+
+    // ++++++++++++++++++++++++++ Report controls ++++++++++++++++++++++++++++++++
+    @FXML
+    public void onReportButtonClicked(){
+        changeSceneTo(this.REPORT_FXML, new ReportController(), reportButton);
     }
 
     // ++++++++++++++++++++++++ Calendar controls ++++++++++++++++++++++++++++++++
@@ -504,9 +511,8 @@ public class MainViewController extends ControllerUtil {
     /**
      * Saves modifies the customer info to the database
      */
-    public void modifyCustomerDataToDatabase() {
+    private void modifyCustomerDataToDatabase() {
         // Updates the customer portion of the database
-        Customer customer = new Customer();
         String customerName = customerNameTextField.getText();
         int selectedIndex = getIndexInListView(customerListView);
         int customerId = customerDB.getCustomerIdByIndex(selectedIndex);
@@ -556,6 +562,10 @@ public class MainViewController extends ControllerUtil {
      * tests that the appointment fields are correctly filled out and the date picker is not null
      */
     private boolean checkAppointmentTimes(){
+        if(appointmentDatePicker.getValue() == null){
+            sendError("Enter a date please!");
+            return false;
+        }
         LocalDateTime start = getLocalDateTimeFromAppointmentFields(appointmentStartTextField, appointmentDatePicker);
         LocalDateTime end = getLocalDateTimeFromAppointmentFields(appointmentEndTextField, appointmentDatePicker);
         int appointmentId;
@@ -566,6 +576,7 @@ public class MainViewController extends ControllerUtil {
         Boolean test3 = isTimeTextFieldWithinBusinessHours(appointmentEndTextField);
         Boolean test4 = !CommonUtil.localDateTimeAfter(start, end);
         Boolean test5 = true;
+
         if(checkIfModifying()){
             appointmentId = appointmentDB.getAppointmentIdFromIndex(getIndexInListView(appointmentListView));
             test5 = !appointmentDB.isAlreadyScheduled(start, end, appointmentId);
@@ -575,6 +586,7 @@ public class MainViewController extends ControllerUtil {
         Boolean test6 = validateTimeFormat(appointmentStartTextField);
         Boolean test7 = validateTimeFormat(appointmentEndTextField);
 
+        // tests
         output = validateControl(test1, appointmentDatePicker, "Please add start and end dates");
         if(!output){
             return false;
@@ -627,7 +639,7 @@ public class MainViewController extends ControllerUtil {
         };
 
         for (TextField textField : textFields) {
-            boolean test = validateControl(!textField.getText().equals(""),
+            boolean test = validateControl(!textField.getText().isEmpty(),
                     textField, "Please fill out all fields");
             if(!test){
                 output = false;
@@ -635,13 +647,12 @@ public class MainViewController extends ControllerUtil {
         }
 
         for (TextArea textArea: textAreas) {
-            boolean test = validateControl(!textArea.getText().equals(""),
+            boolean test = validateControl(!textArea.getText().isEmpty(),
                     textArea, "Please fill out all fields");
             if(!test){
                 output = false;
             }
         }
-        System.out.println("hit 1: " + output);
         return output;
     }
 
@@ -658,12 +669,9 @@ public class MainViewController extends ControllerUtil {
         };
         boolean output = true;
         for (TextField textField : textFields) {
-            if (textField.getText().equals("")) {
-                textField.setStyle("-fx-border-color: grey; -fx-background-color: " + ColorPicker.RED);
-                sendAnAlert("Please fill in all fields", ColorPicker.RED);
+            boolean test = validateControl(!textField.getText().isEmpty(), textField, "Please fill out all customer fields");
+            if (!test) {
                 output = false;
-            } else {
-                textField.setStyle("-fx-border-color: grey; -fx-background-color: white;");
             }
         }
         return output;

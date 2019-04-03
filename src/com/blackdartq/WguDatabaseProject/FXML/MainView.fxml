@@ -20,14 +20,14 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #439775;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox alignment="CENTER" prefHeight="62.0" prefWidth="1207.0" style="-fx-background-color: #FF7F7F;">
+      <VBox alignment="CENTER" prefHeight="62.0" prefWidth="1200.0" style="-fx-background-color: #FF7F7F;">
          <children>
             <Label fx:id="ScheduleItLabel" alignment="CENTER" onMouseClicked="#deleteDatabase" prefHeight="53.0" prefWidth="1207.0" style="-fx-background-color: #439775;" text="Schedule It" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font size="32.0" />
                </font>
             </Label>
-            <Label fx:id="alertLabel" alignment="CENTER" prefHeight="18.0" prefWidth="1232.0" style="-fx-background-color: #439775;" textAlignment="CENTER">
+            <Label fx:id="alertLabel" alignment="CENTER" prefHeight="18.0" prefWidth="1203.0" style="-fx-background-color: #439775;" textAlignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
@@ -119,7 +119,7 @@
                            <HBox.margin>
                               <Insets right="30.0" />
                            </HBox.margin></Button>
-                        <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="89.0" style="-fx-background-color: white;" text="Reports" />
+                        <Button fx:id="reportButton" mnemonicParsing="false" onMouseClicked="#onReportButtonClicked" prefHeight="40.0" prefWidth="89.0" style="-fx-background-color: white;" text="Reports" />
                      </children>
                      <opaqueInsets>
                         <Insets />

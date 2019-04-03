@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 enum ColorPicker{
     RED,
@@ -28,6 +29,7 @@ class FxUtil{
     private final String PATH_TO_LOGFILES = "src/com/blackdartq/WguDatabaseProject/LogFiles/";
     final public String LOGIN_FXML = PATH_TO_FXML + "Login.fxml";
     final public String MAIN_FXML = PATH_TO_FXML + "MainView.fxml";
+    final public String REPORT_FXML = PATH_TO_FXML + "ReportView.fxml";
     final public String LOG_FILE = PATH_TO_LOGFILES + "login.txt";
 
     //+++++++++ Stage functions ++++++++++
@@ -68,7 +70,7 @@ class FxUtil{
             stage.setScene(new Scene(parent));
             stage.show();
         } catch (IOException e) {
-            throw new RuntimeException("couldn't change scene");
+            throw new RuntimeException("couldn't change scene" + "\n" + e);
         }
     }
 }
@@ -116,6 +118,13 @@ public class ControllerUtil<T> extends FxUtil{
         choiceBox.getItems().setAll(arrayList);
 //        for(String stuff : arrayList){
 //        }
+    }
+
+    /**
+     *
+     */
+    public void fillOutChoiceBox(ChoiceBox choiceBox , String[] array){
+        choiceBox.getItems().setAll(Arrays.asList(array));
     }
 
     /**

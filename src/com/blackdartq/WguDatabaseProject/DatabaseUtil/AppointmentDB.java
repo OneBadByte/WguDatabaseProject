@@ -190,6 +190,19 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
     }
 
     /**
+     * Gets the number of appointments by customer id
+     */
+    public int getNumberOfAppointmentsByCustomerId(int id){
+        int count = 0;
+        for (Appointment appointment : appointments){
+            if(appointment.customerId == id){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
      * gets the titles of all the appointments in the database
      */
     public ArrayList getAppointmentTitles(){
