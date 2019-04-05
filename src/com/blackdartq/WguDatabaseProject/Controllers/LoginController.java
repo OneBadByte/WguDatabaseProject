@@ -24,7 +24,8 @@ public class LoginController extends ControllerUtil {
     }
 
     private boolean isRussianLocale(){
-        return locale.getCountry().equals("RS");
+        System.out.println(locale.getCountry());
+        return locale.getCountry().equals("RS") || locale.getCountry().equals("RU");
     }
 
     private void setTextToRussian(){

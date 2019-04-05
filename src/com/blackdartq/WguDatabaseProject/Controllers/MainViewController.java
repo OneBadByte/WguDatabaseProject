@@ -68,10 +68,31 @@ public class MainViewController extends ControllerUtil {
         fillOutChoiceBox(countryChoiceBox, addressDB.getCountries());
         fillOutChoiceBox(appointmentCustomerNameChoiceBox, customerDB.getAllCustomerNames());
 
+        // Keeps the data gathered from the database updated incase changes are made by another program
+        // using the same database
+        // LAMBDA EXAMPLE
+        Runnable databaseKeeper = () -> {
+            while (true){
+                customerDB.getAllCustomersFromDatabase();
+                appointmentDB.getAppointmentsFromDatabase();
+                addressDB.getCountriesFromDatabase();
+                addressDB.getCitiesFromDatabase();
+                addressDB.getAddressesFromTheDatabase();
+                try{
+                    Thread.sleep(100000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        };
+
         // starts up a thread that will check if any appointments are about to start in 15 minutes
+        // LAMBDA EXAMPLE
         Runnable r = () -> {
             while (true) {
                 ArrayList<Integer> appointmentsWith15Minutes = appointmentDB.getAllStartTimesWithin15Minutes();
+                System.out.println("DFSD: " + appointmentsWith15Minutes.size());
                 if(appointmentsWith15Minutes.size() > 0){
                    StringBuilder message = new StringBuilder();
                    message.append("Appointment: ");
@@ -90,7 +111,9 @@ public class MainViewController extends ControllerUtil {
             }
         };
         Thread thread = new Thread(r);
+        Thread thread2 = new Thread(databaseKeeper);
         thread.start();
+        thread2.start();
     }
 
     //++++++ com.blackdartq.WguDatabaseProject.FXML Controls ++++++
@@ -260,6 +283,7 @@ public class MainViewController extends ControllerUtil {
         if (checkIfModifying() && gridPanes == GridPanes.CUSTOMER) {
             addressDB.updateAllAddressData();
             int index = getIndexInListView(customerListView);
+            System.out.println(index);
             setAllCustomerFields(index);
         }
     }
@@ -660,9 +684,10 @@ public class MainViewController extends ControllerUtil {
 
     private boolean stringIsAllNumbers(String string){
         try{
-            Integer.parseInt(string);
+            Long.parseLong(string);
             return true;
         }catch (Exception e){
+            System.out.println("hit");
             return false;
         }
     }
@@ -890,6 +915,7 @@ public class MainViewController extends ControllerUtil {
 
         // fills out address text fields
         int addressId = customerDB.getCustomerAddressIdByIndex(customerIndex);
+        System.out.println("addressId: " + addressId + " CUSTOMER index: " + customerIndex);
         Address addressData = addressDB.getAddressFromAddressesById(addressId);
         customerAddressTextField.setText(addressData.address);
         customerPostalCodeTextField.setText(addressData.postalCode);

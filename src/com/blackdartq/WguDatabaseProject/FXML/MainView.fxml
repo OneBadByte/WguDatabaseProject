@@ -29,7 +29,7 @@
             </Label>
             <Label fx:id="alertLabel" alignment="CENTER" prefHeight="18.0" prefWidth="1203.0" style="-fx-background-color: #439775;" textAlignment="CENTER">
                <font>
-                  <Font size="14.0" />
+                  <Font size="12.0" />
                </font>
                <VBox.margin>
                   <Insets />

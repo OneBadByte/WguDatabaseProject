@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
+public class CustomerDB extends DatabaseUtil{
     private ArrayList<Customer> customers = new ArrayList<>();
 
     public int getCustomersSize(){
@@ -55,13 +55,11 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
         throw new RuntimeException("couldn't retrieve customer index by id");
     }
 
-    @Override
     public void deleteById(int id) {
         for(Customer customer : customers){
             if(customer.customerId == id){
                 try {
                     PreparedStatement statement = connection.prepareStatement("DELETE FROM customer WHERE customerId = ?");
-//                    System.out.println("deleting id: " + id);
                     statement.setInt(1, id);
                     statement.execute();
                 } catch (SQLException e) {
@@ -95,7 +93,7 @@ public class CustomerDB extends DatabaseUtil implements DatabaseTemplate{
         return customers.get(index).addressId;
     }
 
-    private void getAllCustomersFromDatabase(){
+    public void getAllCustomersFromDatabase(){
         final int CUSTOMER_ID = 1;
         final int CUSTOMER_NAME = 2;
         final int ADDRESS_ID = 3;

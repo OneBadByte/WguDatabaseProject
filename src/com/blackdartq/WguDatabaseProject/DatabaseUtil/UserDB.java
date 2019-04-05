@@ -3,7 +3,7 @@ package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class UserDB extends DatabaseUtil implements DatabaseTemplate {
+public class UserDB extends DatabaseUtil{
 
     public boolean validateUser(String username, String password) {
         try {
@@ -14,10 +14,12 @@ public class UserDB extends DatabaseUtil implements DatabaseTemplate {
             int count = 0;
             if (resultSet.next()) {
                 count++;
+                System.out.println(count);
             }
             return count > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            System.out.println("failed to validate user in the database");
             return false;
         }
     }

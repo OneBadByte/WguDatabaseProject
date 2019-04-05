@@ -59,7 +59,7 @@ public class AddressDB extends DatabaseUtil {
     /**
      * gets all the countries from the database and loads the countries ArrayList
      */
-    private void getCountriesFromDatabase(){
+    public void getCountriesFromDatabase(){
         final int COUNTRY_ID = 1;
         final int COUNTRY_NAME = 2;
 
@@ -186,7 +186,7 @@ public class AddressDB extends DatabaseUtil {
     /**
      * Gets all the cities from the database and loads them into cities
      */
-    private void getCitiesFromDatabase(){
+    public void getCitiesFromDatabase(){
         final int CITY_ID = 1;
         final int CITY_NAME = 2;
         final int COUNTRY_ID = 3;

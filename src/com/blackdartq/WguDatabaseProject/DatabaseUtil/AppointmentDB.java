@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import static com.blackdartq.WguDatabaseProject.CommonUtil.CommonUtil.localDateTimeAfter;
 import static com.blackdartq.WguDatabaseProject.CommonUtil.CommonUtil.localDateTimeBefore;
 
-public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
+public class AppointmentDB extends DatabaseUtil {
     private ArrayList<Appointment> appointments = new ArrayList<>();
     public AppointmentDB(){
         getAppointmentsFromDatabase();
@@ -261,7 +261,7 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
     }
 
     public ArrayList getAllStartTimesWithin15Minutes(){
-        ArrayList<Integer> appointmentIndexOutput = new ArrayList<Integer>();
+        ArrayList<Integer> appointmentIndexOutput = new ArrayList<>();
         int count = 0;
         for(Appointment appointment : appointments){
             if(checkLocalDateTimeWithin15Minutes(appointment.start.toLocalDateTime())){
@@ -326,7 +326,6 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
     /**
      * Deletes an appointment from the database using the appointments ID
      */
-    @Override
     public void deleteById(int id) {
         try {
             PreparedStatement statement = connection.prepareStatement(

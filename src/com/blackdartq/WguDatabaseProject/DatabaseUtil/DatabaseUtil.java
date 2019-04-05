@@ -6,12 +6,6 @@ import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 
-interface DatabaseTemplate{
-    void deleteById(int id);
-//    void addRow(ArrayList arrayList);
-//    void updateById(int id, ArrayList arrayList);
-}
-
 public class DatabaseUtil {
     private final String DATABASE_NAME = "U04e9K";
     private final String JDBC_CONNECTION_STRING = "jdbc:mysql://52.206.157.109/" + DATABASE_NAME;
@@ -27,7 +21,6 @@ public class DatabaseUtil {
             System.out.println("Connected");
             createTables();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
-            System.out.println(e);
         }
     }
 

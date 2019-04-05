@@ -11,7 +11,7 @@ CREATE TABLE user
 );
 
 INSERT INTO user value(NULL, 'test', 'test', 0, CURDATE(), 'admin', CURRENT_TIMESTAMP, 'admin');
-# SELECT * from user where userName = 'test' and password = 'test';
+#SELECT * from user where userName = 'test' and password = 'test';
 
 CREATE TABLE country
 (
@@ -45,6 +45,8 @@ CREATE TABLE city
   FOREIGN KEY (countryId) REFERENCES country (countryId) ON DELETE SET NULL ON UPDATE CASCADE
 );
 INSERT INTO city VALUE(null, 'American fork', 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO city VALUE(null, 'London', 5, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO city VALUE(null, 'American fork', 3, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 # ALTER TABLE city WHERE
 # SELECT * FROM city;
 # DELETE FROM city;
@@ -64,11 +66,11 @@ CREATE TABLE address
   FOREIGN KEY (cityId) REFERENCES city (cityId) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
-INSERT INTO address VALUE(null, '828s 7540e', '828s 7402e', 1, '84003', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO address VALUE(null, '828s 5740e', '838s 74023e', 1, '84004', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO address VALUE(null, '828s 7540e', '884s 7403e', 1, '84005', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO address VALUE(null, '838s 7540e', '885s 7404e', 1, '84006', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO address VALUE(null, '848s 7450e', '886s 74320e', 1, '84007', '801-885-4158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO address VALUE(null, '828s 7540e', '828s 7402e', 1, '84003', '8018854158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO address VALUE(null, '828s 5740e', '838s 74023e', 2, '84004', '8018854158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO address VALUE(null, '828s 7540e', '884s 7403e', 3, '84005', '8018854158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO address VALUE(null, '838s 7540e', '885s 7404e', 1, '84006', '8018854158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO address VALUE(null, '848s 7450e', '886s 74320e', 1, '84007', '8018854158',  CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 
 CREATE TABLE customer
 (
@@ -84,8 +86,8 @@ CREATE TABLE customer
 );
 
 INSERT INTO customer VALUE(NULL, 'Test', 1, 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO customer VALUE(NULL, 'Test2', 1, 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
-INSERT INTO customer VALUE(NULL, 'Test3', 1, 1, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO customer VALUE(NULL, 'Test2', 2, 2, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO customer VALUE(NULL, 'Test3', 3, 3, CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 
 #  SELECT * from customer;
 # delete from customer where customerId = 1;
@@ -112,6 +114,8 @@ CREATE TABLE appointment
 );
 
 INSERT INTO appointment VALUE(NULL, 1, 1, 'test wants something', 'testing', 'testing location', 'testing contract', 'testing type', 'http://youtube.com', CURDATE(), CURDATE(), CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO appointment VALUE(NULL, 2, 1, 'Click Me', 'testing', 'testing location', 'testing contract', 'testing type', 'http://youtube.com', CURDATE(), CURDATE(), CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
+INSERT INTO appointment VALUE(NULL, 3, 1, 'database meeting', 'testing', 'testing location', 'testing contract', 'testing type', 'http://youtube.com', CURDATE(), CURDATE(), CURDATE(), 'test', CURRENT_TIMESTAMP, 'test');
 
 
 
