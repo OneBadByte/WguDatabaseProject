@@ -182,6 +182,7 @@ public class MainViewController extends ControllerUtil {
      */
     @FXML
     public void generateMonthGridPane() {
+        weekMultiplier = 0;
         // changes which gridpane is being viewed
         switchViabilityOfGridPane(GridPanes.MONTH);
 
@@ -241,6 +242,7 @@ public class MainViewController extends ControllerUtil {
      */
     @FXML
     public void generateWeekGridPane() {
+        monthMultiplier = 0;
         switchViabilityOfGridPane(GridPanes.WEEK);
         monthWeekLabel.setText(getWeekDayRange());
         for (int i = 1; i < 8; i++) {
@@ -656,6 +658,15 @@ public class MainViewController extends ControllerUtil {
         return output;
     }
 
+    private boolean stringIsAllNumbers(String string){
+        try{
+            Integer.parseInt(string);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
     /**
      * Checks that all the fields are filled out in the customer pane
      */
@@ -674,6 +685,16 @@ public class MainViewController extends ControllerUtil {
                 output = false;
             }
         }
+
+        boolean test1 = stringIsAllNumbers(customerPhoneNumberTextField.getText());
+        boolean test2 = stringIsAllNumbers(customerPostalCodeTextField.getText());
+
+       boolean check1 = validateControl(test1, customerPhoneNumberTextField, "please enter only numbers in phone number field");
+       boolean check2 = validateControl(test2, customerPostalCodeTextField, "please enter only numbers in postal code field");
+       if(!check1 || !check2){
+           return false;
+       }
+
         return output;
     }
 
@@ -731,7 +752,7 @@ public class MainViewController extends ControllerUtil {
      */
     private String getWeekDayRange() {
         Calendar calendar = createCalendar();
-        return getDateFromWeekDay(calendar.get(Calendar.SUNDAY)) + " - " + getDateFromWeekDay(calendar.get(Calendar.SATURDAY));
+        return getDateFromWeekDay(calendar.getFirstDayOfWeek()) + " - " + getDateFromWeekDay(calendar.getFirstDayOfWeek() + 6);
     }
 
     /**
@@ -749,7 +770,7 @@ public class MainViewController extends ControllerUtil {
     private String getDateFromWeekDay(int day) {
         Calendar calendar = createCalendar();
         calendar.set(Calendar.DAY_OF_WEEK, day);
-        return new SimpleDateFormat("dd/MM/YYYY").format(calendar.getTime());
+        return new SimpleDateFormat("MM/dd/YYYY").format(calendar.getTime());
     }
 
     /**
@@ -848,6 +869,7 @@ public class MainViewController extends ControllerUtil {
     }
 
     private LocalDateTime getLocalDateTimeFromAppointmentFields(TextField textField, DatePicker datePicker){
+        // TODO validate these two lines below
         String[] time = textField.getText().split(" ");
         String[] hourMin = time[0].split(":");
         String amPm = time[1].toUpperCase();

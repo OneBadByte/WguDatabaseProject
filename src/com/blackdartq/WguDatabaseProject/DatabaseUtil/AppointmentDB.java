@@ -1,7 +1,11 @@
 package com.blackdartq.WguDatabaseProject.DatabaseUtil;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
@@ -130,11 +134,14 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
             LocalDateTime appointmentEnd = appointment.end.toLocalDateTime();
 
             boolean test1 = localDateTimeAfter(start, appointmentStart);
-            boolean test2 = !localDateTimeAfter(start, appointmentEnd);
+            boolean test2 = localDateTimeBefore(start, appointmentEnd);
+//            boolean test2 = !localDateTimeAfter(start, appointmentEnd);
             boolean test3 = localDateTimeAfter(end, appointmentStart);
-            boolean test4 = !localDateTimeAfter(end, appointmentEnd);
+//            boolean test4 = !localDateTimeAfter(end, appointmentEnd);
+            boolean test4 = localDateTimeBefore(end, appointmentEnd);
 
-            boolean test5 = !localDateTimeAfter(start, appointmentStart);
+            boolean test5 = localDateTimeBefore(start, appointmentStart);
+//            boolean test5 = !localDateTimeAfter(start, appointmentStart);
             boolean test8 = localDateTimeAfter(end, appointmentEnd);
 
             if(test1 && test2 || test3 && test4){
@@ -331,5 +338,53 @@ public class AppointmentDB extends DatabaseUtil implements DatabaseTemplate {
             throw new RuntimeException("Couldn't delete appointment from database");
         }
     }
+
+    public String checkIfLocalTimeBetweenTimestamps(LocalTime localTime){
+        Timestamp testingTimestamp = Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), localTime));
+        String unformattedOutput = "";
+        for(Appointment appointment : appointments){
+            if(testingTimestamp.after(appointment.start) && testingTimestamp.before(appointment.end)){
+                unformattedOutput = unformattedOutput + appointment.title + ",";
+            }
+            if(testingTimestamp.equals(appointment.start) || testingTimestamp.equals(appointment.end)){
+                unformattedOutput = unformattedOutput + appointment.title + ",";
+            }
+        }
+        String[] formattedOutput = unformattedOutput.split(",");
+        if(formattedOutput.length == 1){
+            return formattedOutput[0];
+        }else{
+            return formattedOutput[0] + " | " + formattedOutput[1];
+        }
+    }
+
+    public ArrayList<String> checkIfLocalDateBetweenTimestamps(int month){
+        ArrayList<String> output = new ArrayList<>();
+        LocalDate currentMonth = LocalDate.of(2019, month, 1);
+        LocalDate nextMonth;
+        if(month == 12){
+            nextMonth = LocalDate.of(2019, month, 31);
+        }else{
+            nextMonth = LocalDate.of(2019, month + 1, 1);
+        }
+        Timestamp currentMonthTimestamp = Timestamp.valueOf(LocalDateTime.of(currentMonth, LocalTime.now()));
+        Timestamp nextMonthTimestamp = Timestamp.valueOf(LocalDateTime.of(nextMonth, LocalTime.now()));
+
+        for(Appointment appointment : appointments){
+            Timestamp start = appointment.start;
+            if(start.after(currentMonthTimestamp) && start.before(nextMonthTimestamp) || start.equals(currentMonthTimestamp)){
+                // checks that output doesn't contain multiples of the same type
+                if(!output.contains(appointment.type)){
+                    output.add(appointment.type);
+                }
+            }
+        }
+        return output;
+    }
+
+
+//    public String getAppointmentTextByLocalDateTime(LocalDateTime localDateTime){
+////        for()
+//    }
 
 }
