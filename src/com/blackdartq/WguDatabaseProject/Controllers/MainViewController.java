@@ -92,7 +92,6 @@ public class MainViewController extends ControllerUtil {
         Runnable r = () -> {
             while (true) {
                 ArrayList<Integer> appointmentsWith15Minutes = appointmentDB.getAllStartTimesWithin15Minutes();
-                System.out.println("DFSD: " + appointmentsWith15Minutes.size());
                 if(appointmentsWith15Minutes.size() > 0){
                    StringBuilder message = new StringBuilder();
                    message.append("Appointment: ");
@@ -283,7 +282,6 @@ public class MainViewController extends ControllerUtil {
         if (checkIfModifying() && gridPanes == GridPanes.CUSTOMER) {
             addressDB.updateAllAddressData();
             int index = getIndexInListView(customerListView);
-            System.out.println(index);
             setAllCustomerFields(index);
         }
     }
@@ -687,7 +685,6 @@ public class MainViewController extends ControllerUtil {
             Long.parseLong(string);
             return true;
         }catch (Exception e){
-            System.out.println("hit");
             return false;
         }
     }
@@ -915,7 +912,6 @@ public class MainViewController extends ControllerUtil {
 
         // fills out address text fields
         int addressId = customerDB.getCustomerAddressIdByIndex(customerIndex);
-        System.out.println("addressId: " + addressId + " CUSTOMER index: " + customerIndex);
         Address addressData = addressDB.getAddressFromAddressesById(addressId);
         customerAddressTextField.setText(addressData.address);
         customerPostalCodeTextField.setText(addressData.postalCode);

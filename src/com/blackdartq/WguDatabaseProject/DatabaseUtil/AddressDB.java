@@ -274,7 +274,6 @@ public class AddressDB extends DatabaseUtil {
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.first();
             int id = resultSet.getInt(1);
-            System.out.println("getting address ID: " + id);
             return id;
         } catch (SQLException e) {
 //            e.printStackTrace();
